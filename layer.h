@@ -16,6 +16,7 @@ public:
     void set_ro_memory(const std::string &program_name, const std::span<const uint8_t> &ro_program) {
         programs_list.insert_or_assign(program_name, ro_program);
     }
+    void run() const;
 
     PlatformFeatures usable_features_;
 private:

@@ -24,7 +24,7 @@ add_library(recompiler-static STATIC
         ir/types.h
 
         types.h
-        vector_inplace.h
+        inplace_vector.h
         asm_isi/arm_v8_a.h
         asm_isi/types.h
 )

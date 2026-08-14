@@ -23,6 +23,8 @@ static void testing_armv8_a_2_x86_64(recompiler::SingleProcessor & sp) {
     } arm64_nops;
     // arm64_nops must live as long this program should execute, it's a span not a vector. memory it's in arm64_nops
     sp.set_ro_memory("NOPS for ARMv8-a", arm64_nops.get_asm());
+    sp.run();
+
 }
 
 int main() {

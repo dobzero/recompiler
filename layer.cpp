@@ -36,4 +36,8 @@ void Layer::ctrl_modify_archs(const SupportedFrontends guest_type, const Support
         }
     }
 }
+
+void Layer::run() const {
+    from_cpu_g->is_pc_compiled();
+}
 }

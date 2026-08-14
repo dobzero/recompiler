@@ -4,9 +4,9 @@
 
 namespace recompiler {
 template<typename T, size_t N>
-class vector_inplace {
+class inplace_vector {
 public:
-    vector_inplace() = default;
+    inplace_vector() = default;
 
     template<typename ...Args> requires std::is_constructible_v<T>
     T & emplace_back(Args && ... args) {
@@ -21,6 +21,13 @@ public:
     auto size() const {
         return vi_next_insert;
     }
+
+    void clear() {
+        vi_next_insert=0;
+        // should be avoided
+        //a_container_data_.clear();
+    }
+
 private:
     size_t vi_next_insert=0;
     std::array<T, N> a_container_data_;

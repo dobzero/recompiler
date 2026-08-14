@@ -5,3 +5,10 @@ recompiler::fe::v8_a::ProcessorArm64v8a::ProcessorArm64v8a() : FrontendProcessor
         SupportedBackends::Arch_X_86_64}
         );
 }
+
+bool recompiler::fe::v8_a::ProcessorArm64v8a::is_pc_compiled() {
+    if (cached_pc_region.contains(arm_v8a_state.pc))
+        return true;
+
+    return false;
+}

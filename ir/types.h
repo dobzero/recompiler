@@ -10,6 +10,7 @@ enum class IrOperationType {
 using ir_op=IrOperationType;
 
 class Ir {
+public:
     explicit Ir(const IrOperationType _type) : type(_type) {}
 
     // we can't mimify theses instructions with specific arch dependencies
