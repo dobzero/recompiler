@@ -21,6 +21,8 @@ add_library(recompiler-static STATIC
         fe/v8-a/processor_arm64_v8a.h
         be/x86_64/x86_inplace_asm.cpp
         be/x86_64/x86_inplace_asm.h
+        be/compiled_stream.cpp
+        be/compiled_stream.h
 
         ir/types.h
 
