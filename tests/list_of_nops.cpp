@@ -14,7 +14,7 @@ using sb_=recompiler::SupportedBackends;
 static void testing_armv8_a_2_x86_64(recompiler::SingleProcessor & sp) {
     sp.ctrl_modify_archs(sf_::Frontend_ARM_V8_A, sb_::Arch_X_86_64);
 
-    const class Arm64_Nops : public recompiler::asm_isi::ArmV8_A {
+    const class Arm64_Nops : public asm_isi::ArmV8_A {
     public:
         Arm64_Nops() {
             for (size_t i =0;i<12;i++)

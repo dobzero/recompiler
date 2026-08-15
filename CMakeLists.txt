@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(".")
 
 add_subdirectory(tests)
+add_subdirectory(asm_isi)
 add_library(recompiler-static STATIC
         layer.cpp
         layer.h
@@ -25,6 +26,5 @@ add_library(recompiler-static STATIC
 
         types.h
         inplace_vector.h
-        asm_isi/arm_v8_a.h
-        asm_isi/types.h
 )
+target_link_libraries(recompiler-static PUBLIC asm_isi)
