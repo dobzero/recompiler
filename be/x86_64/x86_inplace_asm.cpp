@@ -26,7 +26,7 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
     for (const auto &ir_op : irs_ops) {
         if (ir_op.is_exclusive_of_arch_type)
             if (ir_op.is_exclusive_of_arch_type != type)
-                throw recompiler_exception("this IR requires a specific backend");
+                throw recompiler_exception("this ir requires a specific backend");
         switch (ir_op.type) {
             case ir::IrOperationType::Ir_NOP_OP:
 

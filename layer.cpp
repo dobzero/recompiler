@@ -10,10 +10,10 @@ Layer::Layer() {
 // modify how will be the guest and host processor
 void Layer::ctrl_modify_archs(const SupportedFrontends guest_type, const SupportedBackends backend_type) {
     if (!from_cpu_g || from_cpu_g->type!=guest_type) {
-        from_cpu_g=[&guest_type]() -> std::unique_ptr<fe::FrontendProcessorCaps> {
+        from_cpu_g=[&guest_type, this]() -> std::unique_ptr<fe::FrontendProcessorCaps> {
             switch (guest_type) {
                 case SupportedFrontends::Frontend_ARM_V8_A:
-                    return std::make_unique<fe::v8_a::ProcessorArm64v8a>();
+                    return std::make_unique<fe::v8_a::ProcessorArm64v8a>(this);
                     break;
                 default:
                     return nullptr;
@@ -37,7 +37,14 @@ void Layer::ctrl_modify_archs(const SupportedFrontends guest_type, const Support
     }
 }
 
-void Layer::run() const {
-    from_cpu_g->is_pc_compiled();
+void Layer::execute_program(const std::string &program_name) {
+    if (!programs_list.contains(program_name)) {
+        return;
+    }
+    read_only.emplace(programs_list.at(program_name));
+    if (!from_cpu_g->is_pc_compiled()) {
+        from_cpu_g->compile_irs_from_pc();
+    }
+
 }
 }

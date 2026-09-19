@@ -9,14 +9,16 @@
 #include <span>
 
 namespace recompiler {
-class Layer {
+
+
+class Layer : public LayerState {
 public:
     Layer();
     void ctrl_modify_archs(SupportedFrontends guest_type, SupportedBackends backend_type);
-    void set_ro_memory(const std::string &program_name, const std::span<const uint8_t> &ro_program) {
+    void create_program(const std::string &program_name, const std::span<const uint8_t> &ro_program) {
         programs_list.insert_or_assign(program_name, ro_program);
     }
-    void run() const;
+    void execute_program(const std::string &program_name);
 
     PlatformFeatures usable_features_;
 private:

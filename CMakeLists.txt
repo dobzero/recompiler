@@ -25,6 +25,8 @@ add_library(recompiler-static STATIC
         be/compiled_stream.h
 
         ir/types.h
+        ir/default_arch_to_ir.cpp
+        ir/ir_cfg.cpp
 
         types.h
         inplace_vector.h

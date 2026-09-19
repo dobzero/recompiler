@@ -11,25 +11,25 @@ namespace {
 
 using sf_= recompiler::SupportedFrontends;
 using sb_=recompiler::SupportedBackends;
-static void testing_armv8_a_2_x86_64(recompiler::SingleProcessor & sp) {
-    sp.ctrl_modify_archs(sf_::Frontend_ARM_V8_A, sb_::Arch_X_86_64);
+static void testing_armv8_a_2_x86_64(recompiler::SingleProcessor & single_jit) {
+    single_jit.ctrl_modify_archs(sf_::Frontend_ARM_V8_A, sb_::Arch_X_86_64);
 
-    const class Arm64_Nops : public asm_isi::ArmV8_A {
+    const class Arm64_Testing : public asm_isi::ArmV8_A {
     public:
-        Arm64_Nops() {
+        Arm64_Testing() {
             for (size_t i =0;i<12;i++)
-                NOP();
+                __NOP();
         }
-    } arm64_nops;
-    // arm64_nops must live as long this program should execute, it's a span not a vector. memory it's in arm64_nops
-    sp.set_ro_memory("NOPS for ARMv8-a", arm64_nops.get_asm());
-    sp.run();
+    } amr64_instruction_container;
+
+    single_jit.create_program("nops.arm", amr64_instruction_container.get_asm());
+    single_jit.execute_program("nops.arm");
 
 }
 
 int main() {
-    recompiler::SingleProcessor cpu_multi_arch_tester;
+    recompiler::SingleProcessor cpu_multi_arch_jit;
 
-    testing_armv8_a_2_x86_64(cpu_multi_arch_tester);
+    testing_armv8_a_2_x86_64(cpu_multi_arch_jit);
 
 }

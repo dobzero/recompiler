@@ -3,6 +3,8 @@
 #include <cstdint>
 
 #include "fe/frontend_processor_caps.h"
+#include "ir/types.h"
+
 namespace recompiler::fe::v8_a {
 struct Arm64ProcessorState {
     // X0–X7: Used to pass arguments into functions and return results.
@@ -16,13 +18,20 @@ struct Arm64ProcessorState {
     uint64_t p_state;
 };
 
+struct Arm64CachedRegion {
+    std::array<uint32_t, 30> last_thirty{}; // 0 isn't a valid arm64 instruction, so, it's our end mark
+    std::array<ir::Ir, 30> irs_list{};
+    size_t ir_count=0;
+};
+
 class ProcessorArm64v8a final : public FrontendProcessorCaps {
 public:
-    ProcessorArm64v8a();
+    explicit ProcessorArm64v8a(LayerState* layer_state);
 
     bool is_pc_compiled() override;
+    bool compile_irs_from_pc() override;
 
-    std::unordered_map<uint64_t, bool> cached_pc_region;
+    std::unordered_map<uint64_t, Arm64CachedRegion> cached_pc_region;
     Arm64ProcessorState arm_v8a_state={};
 };
 }
