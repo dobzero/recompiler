@@ -1,4 +1,6 @@
 #pragma once
+#include <cstdint>
+#include <cstring>
 #include <array>
 #include <span>
 
@@ -19,7 +21,7 @@ public:
         return *type_object;
     }
     T & operator [](size_t index) {
-        return iv_container[index];
+        return reinterpret_cast<T*>(iv_container.data())[index];
     }
     auto size() const {
         return iv_size;
@@ -27,18 +29,16 @@ public:
 
     void clear() {
         if constexpr (std::is_destructible_v<T>) {
-            for (std::span iv_content(iv_container.data(), iv_size);
-                T &type_reference : iv_content)
+            for (T &type_reference : std::span<T>(reinterpret_cast<T*>(iv_container.data()), iv_size))
                 type_reference.~T();
         } else {
-            for (size_t i=0;i<iv_size;i++)
-                iv_container[i]={};
+            memset(iv_container.data(), 0, iv_size);
         }
         iv_size=0;
     }
 
 private:
     size_t iv_size=0;
-    std::array<T, N> iv_container;
+    std::array<uint8_t, N*sizeof(T)> iv_container;
 };
 }
