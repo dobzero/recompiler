@@ -10,7 +10,7 @@ CodeBuffer && CompiledStream::reuse_buffer() {
     return std::move(stream_list);
 }
 
-void CompiledStream::write_bytes(const std::span<uint8_t> & bytes_list) {
+void CompiledStream::write_bytes(const std::span<const uint8_t> & bytes_list) {
     if (stream_list.back().size()+bytes_list.size()>0x80000)
         stream_list.emplace_back();
     auto &bytes_vector=stream_list.back();

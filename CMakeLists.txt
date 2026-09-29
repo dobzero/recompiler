@@ -8,6 +8,7 @@ include_directories(".")
 
 add_subdirectory(tests)
 add_subdirectory(asm_isi)
+add_subdirectory(socdesc)
 add_library(recompiler-static STATIC
         layer.cpp
         layer.h
@@ -31,4 +32,4 @@ add_library(recompiler-static STATIC
         types.h
         inplace_vector.h
 )
-target_link_libraries(recompiler-static PUBLIC asm_isi)
+target_link_libraries(recompiler-static PUBLIC asm_isi socdesc)

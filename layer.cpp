@@ -42,9 +42,13 @@ void Layer::execute_program(const std::string &program_name) {
         return;
     }
     read_only.emplace(programs_list.at(program_name));
-    if (!from_cpu_g->is_pc_compiled()) {
-        from_cpu_g->compile_irs_from_pc();
-    }
-
+    do {
+        if (!from_cpu_g->is_pc_compiled()) {
+            const uint64_t pc = from_cpu_g->compile_irs_from_pc();
+            const auto &irs_list=from_cpu_g->get_irs_from_pc(pc);
+            target_cpu_h->compile_irs(pc, irs_list);
+            break;
+        }
+    } while (true);
 }
 }

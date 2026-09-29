@@ -29,7 +29,7 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
                 throw recompiler_exception("this ir requires a specific backend");
         switch (ir_op.type) {
             case ir::IrOperationType::Ir_NOP_OP:
-
+                x86_result.write_into<uint8_t>(0x90);
             default: {}
         }
     }

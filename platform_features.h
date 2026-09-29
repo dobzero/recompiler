@@ -1,4 +1,5 @@
 #pragma once
+#include "socdesc/socdesc.h"
 #include "types.h"
 
 namespace recompiler {
@@ -12,5 +13,7 @@ public:
     PlatformFeatures();
 
     ProcessorArchType a_type_cpu_compiler_target;
+    socdesc::SOC_Desc soc_description;
+
 };
 }

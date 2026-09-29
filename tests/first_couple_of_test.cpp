@@ -18,7 +18,7 @@ static void testing_armv8_a_2_x86_64(recompiler::SingleProcessor & single_jit) {
     public:
         Arm64_Testing() {
             for (size_t i =0;i<12;i++)
-                __NOP();
+                NOP();
         }
     } amr64_instruction_container;
 

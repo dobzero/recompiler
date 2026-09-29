@@ -14,12 +14,12 @@ public:
 
     template <typename T>
     void write_into(const T & value) {
-        write_bytes(std::span<uint8_t>(reinterpret_cast<const uint8_t *>(&value, sizeof(value))));
+        write_bytes(std::span(reinterpret_cast<const uint8_t *>(&value), sizeof(value)));
     }
 
     CodeBuffer && reuse_buffer();
 private:
-    void write_bytes(const std::span<uint8_t> & bytes_list);
+    void write_bytes(const std::span<const uint8_t> & bytes_list);
 
     CodeBuffer stream_list;
 };

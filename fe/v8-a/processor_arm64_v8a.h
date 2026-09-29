@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <cstdint>
+#include <vector>
 
 #include "fe/frontend_processor_caps.h"
 #include "ir/types.h"
@@ -29,7 +30,9 @@ public:
     explicit ProcessorArm64v8a(LayerState* layer_state);
 
     bool is_pc_compiled() override;
-    bool compile_irs_from_pc() override;
+    uint64_t compile_irs_from_pc() override;
+    std::vector<ir::Ir> get_irs_from_pc(uint64_t pc) override;
+
 
     std::unordered_map<uint64_t, Arm64CachedRegion> cached_pc_region;
     Arm64ProcessorState arm_v8a_state={};
