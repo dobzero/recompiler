@@ -25,6 +25,7 @@ add_library(recompiler-static STATIC
         be/x86_64/x86_inplace_asm.h
         be/compiled_stream.cpp
         be/compiled_stream.h
+        be/backend_processor_caps.cpp
 
         ir/types.h
         ir/default_arch_to_ir.cpp

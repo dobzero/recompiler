@@ -4,6 +4,10 @@
 #include "ir/types.h"
 namespace recompiler::fe {
 
+enum class AliasRegisters {
+    PC
+};
+
 class FrontendProcessorCaps {
 public:
     virtual ~FrontendProcessorCaps() = default;
@@ -18,6 +22,8 @@ public:
     // return the first pc value
     virtual uint64_t compile_irs_from_pc()=0;
     virtual std::vector<ir::Ir> get_irs_from_pc(uint64_t pc)=0;
+
+    virtual uint64_t get_reg(const AliasRegisters &reg)=0;
 
     LayerState *layer_state;
     SupportedFrontends type;

@@ -42,13 +42,16 @@ void Layer::execute_program(const std::string &program_name) {
         return;
     }
     read_only.emplace(programs_list.at(program_name));
+    const auto end_pc_offset = read_only->size();
+    size_t pc=0;
     do {
+        pc=from_cpu_g->get_reg(fe::AliasRegisters::PC);
         if (!from_cpu_g->is_pc_compiled()) {
-            const uint64_t pc = from_cpu_g->compile_irs_from_pc();
+            pc = from_cpu_g->compile_irs_from_pc(); // updates pc, pls save pc before
             const auto &irs_list=from_cpu_g->get_irs_from_pc(pc);
             target_cpu_h->compile_irs(pc, irs_list);
-            break;
         }
-    } while (true);
+        pc += target_cpu_h->execute_at_pc(pc);
+    } while (from_cpu_g->get_reg(fe::AliasRegisters::PC) != end_pc_offset);
 }
 }

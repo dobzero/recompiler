@@ -48,6 +48,12 @@ uint64_t recompiler::fe::v8_a::ProcessorArm64v8a::compile_irs_from_pc() {
     return begin_pc_with;
 }
 
+uint64_t recompiler::fe::v8_a::ProcessorArm64v8a::get_reg(const AliasRegisters &reg) {
+    if (reg==AliasRegisters::PC)
+        return arm_v8a_state.pc;
+    __builtin_unreachable();
+}
+
 std::vector<recompiler::ir::Ir> recompiler::fe::v8_a::ProcessorArm64v8a::get_irs_from_pc(const uint64_t pc) {
     const auto &cached_list = cached_pc_region[pc];
     if (cached_list.ir_count==0) {

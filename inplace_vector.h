@@ -26,6 +26,9 @@ public:
     auto size() const {
         return iv_size;
     }
+    const auto * data() const {
+        return iv_container.data();
+    }
 
     void clear() {
         if constexpr (std::is_destructible_v<T>) {

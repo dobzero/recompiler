@@ -31,6 +31,7 @@ public:
 
     bool is_pc_compiled() override;
     uint64_t compile_irs_from_pc() override;
+    uint64_t get_reg(const AliasRegisters &reg) override;
     std::vector<ir::Ir> get_irs_from_pc(uint64_t pc) override;
 
 
