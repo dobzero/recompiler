@@ -1,8 +1,6 @@
 #include "compiled_stream.h"
 
 namespace recompiler::be {
-
-
 CodeBuffer && CompiledStream::reuse_buffer() {
     for (auto & vector : stream_list) {
         vector.clear();
@@ -11,7 +9,7 @@ CodeBuffer && CompiledStream::reuse_buffer() {
 }
 
 void CompiledStream::write_bytes(const std::span<const uint8_t> & bytes_list) {
-    if (stream_list.back().size()+bytes_list.size()>0x80000)
+    if (stream_list.back().size()+bytes_list.size()>4096)
         stream_list.emplace_back();
     auto &bytes_vector=stream_list.back();
 
