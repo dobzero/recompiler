@@ -29,6 +29,7 @@ add_library(recompiler-static STATIC
         be/x86_64/x86_registers_allocator.h
         be/x86_64/x86_recipes/x86_data_flow.h
         be/x86_64/x86_recipes/x86_functions.h
+        be/x86_64/x86_recipes/x86_all.h
         be/compiled_stream.cpp
         be/compiled_stream.h
         be/registers_allocator.cpp

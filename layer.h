@@ -1,7 +1,7 @@
 #pragma once
-#include "platform_features.h"
 #include "be/backend_processor_caps.h"
 #include "fe/frontend_processor_caps.h"
+#include "platform_features.h"
 #include "block_linking.h"
 
 #include <unordered_map>

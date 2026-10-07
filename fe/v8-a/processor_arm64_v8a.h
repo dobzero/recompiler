@@ -13,12 +13,12 @@ struct HashableLinkAddr {
 };
 
 struct Arm64ProcessorState {
-    std::array<uint64_t, 31> gpr_list_; // x0 is always 0;
+    std::array<uint64_t, 31> gpr_list_;
 
     uint64_t sp, pc;
     uint64_t p_state;
 
-    std::array<HashableLinkAddr, 0x3FF> fastjump_table; // used when a jump with a register appears
+    std::array<HashableLinkAddr, 0x3FF> fastjump_table; // used when a jump with a register appears while runtime
 };
 
 struct Arm64CachedRegion {
