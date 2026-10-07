@@ -2,8 +2,12 @@
   <dictionary name="project">
     <words>
       <w>TDMI</w>
+      <w>addrblk</w>
+      <w>fastjump</w>
       <w>movecs</w>
+      <w>sizeblk</w>
       <w>socdesc</w>
+      <w>uthr</w>
     </words>
   </dictionary>
 </component>

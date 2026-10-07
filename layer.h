@@ -2,6 +2,7 @@
 #include "platform_features.h"
 #include "be/backend_processor_caps.h"
 #include "fe/frontend_processor_caps.h"
+#include "block_linking.h"
 
 #include <unordered_map>
 #include <cstdint>
@@ -9,8 +10,6 @@
 #include <span>
 
 namespace recompiler {
-
-
 class Layer : public LayerState {
 public:
     Layer();
@@ -20,12 +19,16 @@ public:
     }
     void execute_program(const std::string &program_name);
 
+    void * compile_cfg_at(uint64_t pc);
+
     PlatformFeatures usable_features_;
 private:
     std::unordered_map<std::string, std::span<const uint8_t>> programs_list;
 
     std::unique_ptr<fe::FrontendProcessorCaps> from_cpu_g;
     std::unique_ptr<be::BackendProcessorCaps> target_cpu_h;
+
+    BlockLinking block_linking;
 
 };
 }

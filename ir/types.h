@@ -23,5 +23,6 @@ public:
 
 std::optional<Ir> default_arm64_to_ir(uint32_t inst);
 bool ir_search_for_cfg_end(const std::span<Ir> &irs)  ;
+bool ir_is_a_branch(const Ir &ir);
 
 }

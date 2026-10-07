@@ -2,9 +2,14 @@
 
 #include "fe/v8-a/processor_arm64_v8a.h"
 #include "be/x86_64/x86_inplace_asm.h"
-namespace recompiler {
-Layer::Layer() {
 
+extern "C" void * layer_stub_function(void * layer_ptr, const uint64_t pc) {
+    auto * layer = static_cast<recompiler::Layer *>(layer_ptr);
+    return layer->compile_cfg_at(pc);
+}
+
+namespace recompiler {
+Layer::Layer() : block_linking(this, layer_stub_function) {
 }
 
 // modify how will be the guest and host processor
@@ -46,12 +51,20 @@ void Layer::execute_program(const std::string &program_name) {
     size_t pc=0;
     do {
         pc=from_cpu_g->get_reg(fe::AliasRegisters::PC);
-        if (!from_cpu_g->is_pc_compiled()) {
-            pc = from_cpu_g->compile_irs_from_pc(); // updates pc, pls save pc before
-            const auto &irs_list=from_cpu_g->get_irs_from_pc(pc);
-            target_cpu_h->compile_irs(pc, irs_list);
-        }
-        pc += target_cpu_h->execute_at_pc(pc);
+        if (compile_cfg_at(pc)==nullptr)
+            break;
+
+        pc += target_cpu_h->execute_at_pc(pc, from_cpu_g->get_thr_addr());
     } while (from_cpu_g->get_reg(fe::AliasRegisters::PC) != end_pc_offset);
+}
+
+void * Layer::compile_cfg_at(uint64_t pc) {
+    if (!from_cpu_g->is_pc_compiled()) {
+        pc = from_cpu_g->compile_irs_from_pc(); // updates pc, pls save pc before
+        const auto &irs_list=from_cpu_g->get_irs_from_pc(pc);
+        target_cpu_h->compile_irs(pc, irs_list, block_linking);
+    }
+
+    return target_cpu_h->pc_x_compiled_block[pc].begin;
 }
 }

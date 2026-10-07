@@ -7,19 +7,22 @@
 #include "ir/types.h"
 
 namespace recompiler::fe::v8_a {
+struct HashableLinkAddr {
+    uint64_t target_pc;
+    void * jump_addr;
+};
+
 struct Arm64ProcessorState {
-    // X0–X7: Used to pass arguments into functions and return results.
-    // X9–X15: Temporary registers (caller-saved).
-    // X19–X28: Callee-saved registers (must be preserved across function calls).
-    // X29 (FP): The Frame Pointer
-    // X30 (LR): The Link Register
     std::array<uint64_t, 31> gpr_list_; // x0 is always 0;
 
     uint64_t sp, pc;
     uint64_t p_state;
+
+    std::array<HashableLinkAddr, 0x3FF> fastjump_table; // used when a jump with a register appears
 };
 
 struct Arm64CachedRegion {
+    // todo: this cached irs lists should be bigger
     std::array<uint32_t, 30> last_thirty{}; // 0 isn't a valid arm64 instruction, so, it's our end mark
     std::array<ir::Ir, 30> irs_list{};
     size_t ir_count=0;
@@ -30,6 +33,9 @@ public:
     explicit ProcessorArm64v8a(LayerState* layer_state);
 
     bool is_pc_compiled() override;
+    void * get_thr_addr() override {
+        return &arm_v8a_state;
+    }
     uint64_t compile_irs_from_pc() override;
     uint64_t get_reg(const AliasRegisters &reg) override;
     std::vector<ir::Ir> get_irs_from_pc(uint64_t pc) override;
