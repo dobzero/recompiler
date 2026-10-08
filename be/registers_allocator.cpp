@@ -14,15 +14,14 @@ void RegistersAllocator::allocate(uint64_t target, const uint64_t index) {
             register_meta.target = target;
         }
     } else if (target == index) {
-        RegisterRuntimeMeta register_meta{
-            .index = index,
-            .target = target,
-            .width = default_width,
-            .is_dirty = false,
-            .is_reusable = true
-        };
         if (!indexable_used_regs.contains(target)) {
-            indexable_used_regs.emplace(target, register_meta);
+            indexable_used_regs.emplace(target, RegisterRuntimeMeta{
+                .index = index,
+                .target = target,
+                .width = default_width,
+                .is_dirty = false,
+                .is_reusable = true
+            });
         }
     }
 

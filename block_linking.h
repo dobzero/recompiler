@@ -18,7 +18,7 @@ class BlockLinking {
 public:
     BlockLinking(void *l_class, c_function_stub_t c_function_for_fallback);
     void pc_set_block(std::uint64_t pc, void *block);
-    void * fix_branch_ir(const ir::Ir &ir, uint64_t last_pc);
+    void * get_jump_addr_from_ir_x_pc(const ir::Ir &ir, uint64_t last_pc);
 
     void *layer;
     c_function_stub_t c_stub_function;

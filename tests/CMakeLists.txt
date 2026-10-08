@@ -9,4 +9,4 @@ function(recompiler_add_test target desc)
 endfunction()
 
 
-recompiler_add_test(first_couple_of_test "Bunch of NOPS of all fe-archs, just for test entry points" first_couple_of_test.cpp)
+recompiler_add_test(entry_engine_test "just for test entry points" entry_engine_test.cpp)

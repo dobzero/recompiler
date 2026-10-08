@@ -2,8 +2,8 @@
 
 #include "inplace_vector.h"
 #include "ir/types.h"
+#include <vector>
 namespace recompiler::fe {
-
 enum class AliasRegisters {
     PC
 };

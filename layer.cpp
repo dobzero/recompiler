@@ -12,7 +12,7 @@ namespace recompiler {
 Layer::Layer() : block_linking(this, layer_stub_function) {
 }
 
-// modify how will be the guest and host processor
+// modify what will be the guest and host processor
 void Layer::ctrl_modify_archs(const SupportedFrontends guest_type, const SupportedBackends backend_type) {
     if (!from_cpu_g || from_cpu_g->type!=guest_type) {
         from_cpu_g=[&guest_type, this]() -> std::unique_ptr<fe::FrontendProcessorCaps> {
@@ -38,7 +38,10 @@ void Layer::ctrl_modify_archs(const SupportedFrontends guest_type, const Support
     }
 
     // checking compatibility of both mechanism
-    if (auto &supported_archs_type = from_cpu_g->supported_target_cpu_type; supported_archs_type[0]!=backend_type||supported_archs_type[1]!=backend_type) {
+    if (auto &supported_archs_type = from_cpu_g->supported_target_cpu_type;
+        supported_archs_type[0]!=backend_type||
+        supported_archs_type[1]!=backend_type) {
+
     }
 }
 
