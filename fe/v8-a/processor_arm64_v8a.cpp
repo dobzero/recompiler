@@ -33,19 +33,19 @@ uint64_t recompiler::fe::v8_a::ProcessorArm64v8a::compile_irs_from_pc() {
             if (!layer_state->is_reachable(arm_v8a_state.pc)) {
                 break;
             }
-            cached_list.last_inst_list.push_back(layer_state->read_u32(arm_v8a_state.pc));
+            cached_list.last_inst_list.emplace_back(layer_state->read_u32(arm_v8a_state.pc));
             arm_v8a_state.pc+=4;
         }
 
         for (const auto &inst_arm64 : cached_list.last_inst_list) {
             if (inst_arm64) {
                 const auto ir_value = conv_arm64_to_ir(inst_arm64);
-                cached_list.irs_list.push_back(ir_value);
+                cached_list.irs_list.emplace_back(ir_value);
             } else {
                 break;
             }
         }
-        cached_list.irs_list.push_back(ir::Ir{ir::IrOperationType::Ir_Default});
+        cached_list.irs_list.emplace_back(ir::Ir{ir::IrOperationType::Ir_Default});
 
         cached_pc_region.insert_or_assign(first_pc, cached_list);
     } while (!ir_search_for_cfg_end(cached_list.irs_list));

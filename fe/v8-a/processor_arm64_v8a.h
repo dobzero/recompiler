@@ -21,43 +21,9 @@ struct Arm64ProcessorState {
     std::array<HashableLinkAddr, 0x3FF> fastjump_table; // used when a jump with a register appears while runtime
 };
 
-template<typename T, size_t N>
-class NonReallocatableVector {
-public:
-    T & push_back(const T value) {
-        return data[i_size++]=value;
-    }
-    auto size() const {
-        return i_size;
-    }
-    auto capacity() const {
-        return data.size();
-    }
-    auto empty() const {
-        return size()==0;
-    }
-
-    operator std::span<T>() {
-        return std::span(&data[0], i_size);
-    }
-    auto & operator [](const size_t i) const {
-        return data[i];
-    }
-    auto begin() const {
-        return data.begin();
-    }
-    auto end() const {
-        return data.begin()+i_size;
-    }
-private:
-    size_t i_size=0;
-    std::array<T, N> data;
-};
-
 struct Arm64CachedRegion {
-    // todo: this cached irs lists should be bigger
-    NonReallocatableVector<uint32_t, 60> last_inst_list{}; // 0 isn't a valid arm64 instruction, so, it's our end mark
-    NonReallocatableVector<ir::Ir, 60> irs_list{};
+    inplace_vector<uint32_t, 60> last_inst_list{}; // 0 isn't a valid arm64 instruction, so, it's our end mark
+    inplace_vector<ir::Ir, 60> irs_list{};
 };
 
 class ProcessorArm64v8a final : public FrontendProcessorCaps {

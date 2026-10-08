@@ -1,7 +1,7 @@
 #include "types.h"
 
 namespace recompiler::ir {
-bool ir_search_for_cfg_end(const std::span<Ir> &irs) {
+bool ir_search_for_cfg_end(const std::span<const Ir> &irs) {
     for (const auto &ir : irs) {
         if (ir_is_a_branch(ir))
             return true;
