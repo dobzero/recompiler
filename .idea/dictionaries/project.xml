@@ -4,6 +4,7 @@
       <w>TDMI</w>
       <w>addrblk</w>
       <w>fastjump</w>
+      <w>modrm</w>
       <w>movecs</w>
       <w>sizeblk</w>
       <w>socdesc</w>

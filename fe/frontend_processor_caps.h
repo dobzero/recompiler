@@ -5,7 +5,7 @@
 #include <vector>
 namespace recompiler::fe {
 enum class AliasRegisters {
-    PC
+    PC, Linker
 };
 
 class FrontendProcessorCaps {
@@ -20,9 +20,9 @@ public:
     }
 
     virtual void * get_thr_addr()=0;
-    virtual bool is_pc_compiled()=0;
+    virtual bool is_pc_compiled(uint64_t)=0;
     // return the first pc value
-    virtual uint64_t compile_irs_from_pc()=0;
+    virtual uint64_t compile_irs_from_pc(uint64_t)=0;
     virtual std::vector<ir::Ir> get_irs_from_pc(uint64_t pc)=0;
 
     virtual uint64_t get_reg(const AliasRegisters &reg)=0;

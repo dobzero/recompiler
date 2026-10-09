@@ -6,7 +6,9 @@
 namespace recompiler::ir {
 enum class IrOperationType {
     Ir_Default, // just for construction got esy
-    Ir_NOP_OP
+    Ir_NOP_OP,
+    Ir_BRANCH_OP,
+    Ir_RET_OP,
 };
 using ir_op=IrOperationType;
 
@@ -18,6 +20,8 @@ public:
     // we can't mimify theses instructions with specific arch dependencies
     std::optional<ProcessorArchType> is_exclusive_of_arch_type;
     IrOperationType type{IrOperationType::Ir_Default};
+    int64_t offset{}; // for branches
+    uint64_t pc{};
 };
 
 

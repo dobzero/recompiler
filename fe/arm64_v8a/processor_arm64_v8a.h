@@ -4,9 +4,10 @@
 #include <vector>
 
 #include "fe/frontend_processor_caps.h"
+#include "arm64_b_list.h"
 #include "ir/types.h"
 
-namespace recompiler::fe::v8_a {
+namespace recompiler::fe::arm64_v8a {
 struct HashableLinkAddr {
     uint64_t target_pc;
     void * jump_addr;
@@ -19,8 +20,15 @@ struct Arm64ProcessorState {
     uint64_t p_state;
 
     std::array<HashableLinkAddr, 0x3FF> fastjump_table; // used when a jump with a register appears while runtime
-};
 
+    static consteval size_t get_offset_of(const std::string &member, const uint64_t index = 0) {
+        if (member == "gpr_list_")
+            return offsetof(Arm64ProcessorState, gpr_list_) + sizeof(gpr_list_[0]) * index;
+        if (member == "pc")
+            return offsetof(Arm64ProcessorState, pc);
+        return {};
+    }
+};
 struct Arm64CachedRegion {
     inplace_vector<uint32_t, 60> last_inst_list{}; // 0 isn't a valid arm64 instruction, so, it's our end mark
     inplace_vector<ir::Ir, 60> irs_list{};
@@ -30,16 +38,17 @@ class ProcessorArm64v8a final : public FrontendProcessorCaps {
 public:
     explicit ProcessorArm64v8a(LayerState* layer_state);
 
-    bool is_pc_compiled() override;
+    bool is_pc_compiled(uint64_t) override;
     void * get_thr_addr() override {
         return &arm_v8a_state;
     }
-    uint64_t compile_irs_from_pc() override;
+    uint64_t compile_irs_from_pc(uint64_t) override;
     uint64_t get_reg(const AliasRegisters &reg) override;
     std::vector<ir::Ir> get_irs_from_pc(uint64_t pc) override;
 
 
     std::unordered_map<uint64_t, Arm64CachedRegion> cached_pc_region;
+    std::vector<InstructionMasks> arm64_inst_ordered;
     Arm64ProcessorState arm_v8a_state={};
 };
 }

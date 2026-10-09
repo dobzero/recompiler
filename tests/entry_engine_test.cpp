@@ -17,8 +17,15 @@ static void testing_armv8_a_2_x86_64(recompiler::SingleProcessor & single_jit) {
     const class Arm64PrNops : public asm_isi::ArmV8A_All {
     public:
         Arm64PrNops() {
+            label("_start:");
+            B("twelve_nops:");
+            B("end:");
+
+            label("twelve_nops:");
             for (size_t i =0;i<12;i++)
                 NOP();
+            RET();
+            label("end:");
         }
     } arm64_pr_n;
 

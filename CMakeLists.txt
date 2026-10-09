@@ -18,8 +18,10 @@ add_library(recompiler-static STATIC
         block_linking.cpp
         block_linking.h
 
-        fe/v8-a/processor_arm64_v8a.cpp
-        fe/v8-a/processor_arm64_v8a.h
+        fe/arm64_v8a/processor_arm64_v8a.cpp
+        fe/arm64_v8a/processor_arm64_v8a.h
+        fe/arm64_v8a/arm64_b_list.cpp
+        fe/arm64_v8a/arm64_b_list.h
         fe/frontend_processor_caps.h
         be/backend_processor_caps.h
 
