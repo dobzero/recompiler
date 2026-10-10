@@ -25,7 +25,7 @@ class BackendProcessorCaps {
     virtual ~BackendProcessorCaps() = default;
 
     explicit BackendProcessorCaps(const SupportedBackends _type) : type(_type) {}
-    virtual void compile_irs(uint64_t pc_, const std::vector<ir::Ir> &irs_ops, BlockLinking &linker, SupportedFrontends fe_type)=0;
+    virtual void compile_irs(uint64_t pc_, const std::vector<ir::Ir> &irs_ops, BlockLinking &linker)=0;
     virtual size_t execute_at_pc(uint64_t pc_, void * thr_addr)=0;
     SupportedBackends type;
 

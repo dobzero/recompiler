@@ -17,7 +17,7 @@ std::pair<void *,uint64_t> BlockLinking::get_cfg_jump_addr(const ir::Ir &ir) {
     if (!ir_is_a_branch(ir))
         return {};
 
-    const auto pc_val = ir.pc + ir.offset;
+    const auto pc_val = ir.pc + ir.ir_r_list.begin()->value;
     return [&] {
         if (!pc_x_block.contains(pc_val)) {
             c_stub_function(layer, pc_val);

@@ -62,7 +62,7 @@ void * Layer::compile_cfg_at(uint64_t pc) {
     if (!guestpr->is_pc_compiled(pc)) {
         pc = guestpr->compile_irs_from_pc(pc); // updates pc, pls save pc before
         const auto &irs_list=guestpr->get_irs_from_pc(pc);
-        hostpr->compile_irs(pc, irs_list, block_linking, guestpr->type);
+        hostpr->compile_irs(pc, irs_list, block_linking);
     }
 
     return hostpr->pc_x_compiled_block[pc].begin;

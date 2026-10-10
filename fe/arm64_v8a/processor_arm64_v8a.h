@@ -19,15 +19,19 @@ struct Arm64ProcessorState {
     uint64_t sp, pc;
     uint64_t p_state;
 
-    std::array<HashableLinkAddr, 0x3FF> fastjump_table; // used when a jump with a register appears while runtime
-
-    static consteval size_t get_offset_of(const std::string &member, const uint64_t index = 0) {
-        if (member == "gpr_list_")
-            return offsetof(Arm64ProcessorState, gpr_list_) + sizeof(gpr_list_[0]) * index;
-        if (member == "pc")
-            return offsetof(Arm64ProcessorState, pc);
-        return {};
+    static consteval auto offset_of_reg(const uint64_t i) {
+        constexpr auto offset = offsetof(Arm64ProcessorState, gpr_list_);
+        return offset + sizeof(gpr_list_[0]) * i;
     }
+    static consteval auto offset_of(const AliasRegisters alias) {
+        if (alias==AliasRegisters::Linker)
+            return offset_of_reg(30);
+        if (alias==AliasRegisters::PC)
+            return offsetof(Arm64ProcessorState, pc);
+        return 0UL;
+    }
+
+    std::array<HashableLinkAddr, 0x3FF> fastjump_table; // used when a jump with a register appears while runtime
 };
 struct Arm64CachedRegion {
     inplace_vector<uint32_t, 60> last_inst_list{}; // 0 isn't a valid arm64 instruction, so, it's our end mark
@@ -48,7 +52,7 @@ public:
 
 
     std::unordered_map<uint64_t, Arm64CachedRegion> cached_pc_region;
-    std::vector<InstructionMasks> arm64_inst_ordered;
+    std::vector<InstructionMeta> arm64_inst_ordered;
     Arm64ProcessorState arm_v8a_state={};
 };
 }

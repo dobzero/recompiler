@@ -17,24 +17,25 @@ bool recompiler::fe::arm64_v8a::ProcessorArm64v8a::is_pc_compiled(const uint64_t
 
 namespace recompiler {
 using namespace fe::arm64_v8a;
-using I_M = InstructionMasks;
+using I_M = InstructionMeta;
 const std::vector arm64_list_default_table={
     I_M{.mask = 0xFC000000, .value = 0x14000000, .or_conv_func_ir = B_IR, .hits = 0}
 };
 
 
-ir::Ir conv_arm64_to_ir(std::vector<InstructionMasks> &arm64_list_ord, const uint32_t inst) {
+inplace_vector<ir::Ir, 10> conv_arm64_to_ir(std::vector<InstructionMeta> &arm64_list_ord, const uint32_t inst, uint64_t pc) {
+    inplace_vector<ir::Ir, 10> ir_r;
     if (const auto default_ir = ir::default_arm64_to_ir(inst)) {
-        return *default_ir;
+        ir_r.emplace_back(*default_ir);
+        return ir_r;
     }
-    ir::Ir ir_r{};
     for (auto arm64_list_it = arm64_list_ord.begin(); arm64_list_it!=arm64_list_ord.end(); ) {
         if ((inst & arm64_list_it->mask) != arm64_list_it->value) {
             ++arm64_list_it;
             continue;
         }
         arm64_list_it->hits++;
-        arm64_list_it->or_conv_func_ir(ir_r, inst);
+        arm64_list_it->or_conv_func_ir(ir_r, inst, pc);
 
         break;
     }
@@ -62,10 +63,10 @@ uint64_t recompiler::fe::arm64_v8a::ProcessorArm64v8a::compile_irs_from_pc(const
 
         for (const auto &inst_arm64 : cached_list.last_inst_list) {
             if (inst_arm64) {
-                auto ir_value = conv_arm64_to_ir(arm64_inst_ordered, inst_arm64);
-                ir_value.pc=ir_x_pc;
+                auto ir_value = conv_arm64_to_ir(arm64_inst_ordered, inst_arm64, ir_x_pc);
                 ir_x_pc += 4;
-                cached_list.irs_list.emplace_back(ir_value);
+                for (const auto &ir_valid : ir_value)
+                    cached_list.irs_list.emplace_back(ir_valid);
             } else {
                 break;
             }
