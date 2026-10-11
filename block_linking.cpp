@@ -26,6 +26,10 @@ std::pair<void *,uint64_t> BlockLinking::get_cfg_jump_addr(const ir::Ir &ir) {
     }();
 }
 
+bool BlockLinking::is_entry_point(const uint64_t pc) {
+    return std::ranges::find(pc_entries, pc) != pc_entries.end();
+}
+
 void BlockLinking::remove_unreachable_cfgs(const std::unique_ptr<be::BackendProcessorCaps> &hostpr) {
     for (auto pc_x_blk_it = hostpr->pc_x_compiled_block.begin();
             pc_x_blk_it != hostpr->pc_x_compiled_block.end(); ) {

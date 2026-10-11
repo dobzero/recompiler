@@ -5,6 +5,7 @@
       <w>addrblk</w>
       <w>adrof</w>
       <w>fastjump</w>
+      <w>guestpr</w>
       <w>hostpr</w>
       <w>modrm</w>
       <w>movecs</w>

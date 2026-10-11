@@ -22,7 +22,8 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
     CompiledStream x86_cs;
     const X86RegistersAllocator x86_alloc{X86RegisterType::R15};
 
-    x86_recipes::Functions::do_prologue(x86_cs, x86_alloc);
+    if (linker.is_entry_point(pc_))
+        x86_recipes::Functions::do_prologue(x86_cs, x86_alloc);
 
     struct FixBranch {
         ir::Ir ir_val;
@@ -42,8 +43,12 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
                 break;
             }
             case ir::IrOperationType::Ir_BRANCH_OP: {
-            }
-            case ir::IrOperationType::Ir_RET_OP: {
+                x86_recipes::DataFlow::MOV_R64_MEM(x86_cs, X86RegisterType::RDI, x86_alloc.get_thr_reg(), 0);
+                x86_recipes::DataFlow::MOV_R64_IMM64(x86_cs, X86RegisterType::RSI, ir_op.ir_r_list[0].value);
+                x86_recipes::All::JMP_ABS(x86_cs, reinterpret_cast<void *>(linker.c_stub_function));
+                x86_recipes::All::JMP_REG(x86_cs, X86RegisterType::RAX);
+                break;
+
             }
             case ir::IrOperationType::Ir_MOVE_OP: {
                 if (ir_op.ir_r_list[1].type==ir::IrOperand::Type::Immediate) {
@@ -54,18 +59,19 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
                 break;
             }
             case ir::IrOperationType::Ir_STORE_OP: {
-                x86_recipes::DataFlow::MOV_R64_MEM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[2].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                x86_recipes::DataFlow::MOV_MEM_R64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[2].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 break;
             }
             default: {
-                throw std::logic_error{"Unsupported backend type"};
+                //throw std::logic_error{"(recomp:) unsupported backend type"};
             }
         }
 
         ir_x_x86_tracing.emplace_back(std::make_pair(&ir_op, x86_cs.get_stream_size()));
     }
 
-    x86_recipes::Functions::do_epilogue(x86_cs);
+    if (linker.is_entry_point(pc_))
+        x86_recipes::Functions::do_epilogue(x86_cs);
 
     compiled_pcs.emplace(pc_, std::move(x86_cs));
 

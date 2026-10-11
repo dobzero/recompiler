@@ -5,7 +5,13 @@
 
 extern "C" void * layer_stub_function(void * layer_ptr, const uint64_t pc) {
     auto * layer = static_cast<recompiler::Layer *>(layer_ptr);
-    return layer->compile_cfg_at(pc);
+    void * block_result = layer->compile_cfg_at(pc);
+    if (const auto arm64_guest = std::dynamic_pointer_cast<recompiler::fe::arm64_v8a::ProcessorArm64v8a>(layer->guestpr)) {
+        auto & pc_cache = arm64_guest->advanced_risc_ctx.fastjump_table[pc >> 2];
+        pc_cache.target_pc = pc;
+        pc_cache.jump_addr = block_result;
+    }
+    return block_result;
 }
 
 namespace recompiler {
@@ -38,14 +44,14 @@ void Layer::ctrl_modify_archs(const SupportedFrontends guest_type, const Support
     }
 }
 
-    // executes until program ends
+// executes until programs finish or reach the final text pc
 void Layer::execute_program(const std::string &pr_name) {
     if (!programs_list.contains(pr_name)) {
         return;
     }
     read_only.emplace(programs_list.at(pr_name));
     const auto end_pc_offset = read_only->size();
-    auto get_pc = [this] {
+    auto get_pc = [&] {
         return guestpr->get_reg(fe::AliasRegisters::PC);
     };
     block_linking.pc_set_entry(get_pc());
@@ -55,6 +61,7 @@ void Layer::execute_program(const std::string &pr_name) {
             break;
 
         hostpr->execute_at_pc(get_pc(), guestpr->get_thr_addr());
+        break;
     } while (get_pc() != end_pc_offset);
 }
 

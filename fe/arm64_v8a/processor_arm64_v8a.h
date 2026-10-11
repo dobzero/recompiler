@@ -14,6 +14,7 @@ struct HashableLinkAddr {
 };
 
 struct Arm64ProcessorState {
+    void * layer_addr;
     std::array<uint64_t, 31> gpr_list_;
 
     uint64_t sp, pc;

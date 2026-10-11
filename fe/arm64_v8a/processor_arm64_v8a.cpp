@@ -6,6 +6,7 @@ recompiler::fe::arm64_v8a::ProcessorArm64v8a::ProcessorArm64v8a(LayerState * lay
     add_supported_backend_targets({
         SupportedBackends::Arch_X_86_64}
         );
+    advanced_risc_ctx.layer_addr = layer_state;
 }
 
 bool recompiler::fe::arm64_v8a::ProcessorArm64v8a::is_pc_compiled(const uint64_t pc) {

@@ -21,11 +21,11 @@ public:
     void * compile_cfg_at(uint64_t pc);
 
     PlatformFeatures usable_features_;
+    std::shared_ptr<fe::FrontendProcessorCaps> guestpr;
+    std::shared_ptr<be::BackendProcessorCaps> hostpr;
 private:
     std::unordered_map<std::string, std::vector< uint8_t>> programs_list;
 
-    std::unique_ptr<fe::FrontendProcessorCaps> guestpr;
-    std::unique_ptr<be::BackendProcessorCaps> hostpr;
 
     BlockLinking block_linking;
 

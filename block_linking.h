@@ -2,6 +2,7 @@
 #include "ir/types.h"
 #include <unordered_map>
 #include <cstdint>
+#include <vector>
 
 namespace recompiler {
 struct LinkInfo {
@@ -20,12 +21,13 @@ public:
     void pc_set_entry(std::uint64_t pc);
     std::pair<void *,uint64_t> get_cfg_jump_addr(const ir::Ir &ir);
 
-
+    bool is_entry_point(uint64_t pc);
     void remove_unreachable_cfgs(const std::unique_ptr<be::BackendProcessorCaps> &hostpr);
 
     void *layer;
     c_function_stub_t c_stub_function;
     std::unordered_map<uint64_t, LinkInfo> pc_x_block;
+    std::vector<uint64_t> pc_entries={0};
     std::unordered_map<uint64_t, LinkInfo*> pc_entry_points; // exclude from dead-code optimizations
 
 };

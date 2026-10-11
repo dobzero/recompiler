@@ -20,14 +20,14 @@ public:
         return *type_object;
     }
     template<typename ...Args> requires std::is_constructible_v<T, Args...>
-    void emplace_n_and_call(auto &&callback, const size_t n, auto &&... args) {
+    void emplace_n_and_call(auto &&callback, const size_t n, auto && ... args) {
         auto * placement = reinterpret_cast<T*>(data_bytes.data()) + i_size;
         for (size_t i = 0; i < n; i++) {
             emplace_back(std::forward<Args>(args)...);
         }
         const std::span<T> types(placement, n);
         if (types.end().base() != end()) {
-
+            throw std::bad_alloc();
         }
         callback(types);
     }

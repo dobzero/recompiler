@@ -42,7 +42,7 @@ public:
     // we can't mimify theses instructions with specific arch dependencies
     std::optional<ProcessorArchType> is_exclusive_of_arch_type;
     IrOperationType type{IrOperationType::Ir_NONE};
-    inplace_vector<IrOperand, 3> ir_r_list;
+    inplace_vector<IrOperand, 4> ir_r_list;
     uint64_t pc{};
 };
 

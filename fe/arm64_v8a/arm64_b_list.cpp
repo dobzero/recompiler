@@ -19,7 +19,6 @@ void a_b_ir(inplace_vector<ir::Ir, 15> &ir, const uint32_t inst, const uint64_t 
         // set pc to offset
         ir_move_reg_imm(ir_v[2], 1, offset);
         ir_store_reg_imm_reg(ir_v[3], 15, A64_S::offset_of(AliasRegisters::PC), 1); // // THREAD->PC = OFFSET
-        // reloads pc to first reg
         // set branch
         ir_branch_offset(ir_v[4], offset);
     }, 5);
