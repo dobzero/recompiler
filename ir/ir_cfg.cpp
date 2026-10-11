@@ -14,7 +14,7 @@ bool ir_is_a_branch(const Ir &ir) {
         return true;
     if (ir.type==IrOperationType::Ir_RET_OP)
         return true;
-    if (ir.type==IrOperationType::Ir_Default)
+    if (ir.type==IrOperationType::Ir_NONE)
         return true;
     return false;
 }

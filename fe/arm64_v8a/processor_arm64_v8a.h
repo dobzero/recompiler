@@ -19,19 +19,20 @@ struct Arm64ProcessorState {
     uint64_t sp, pc;
     uint64_t p_state;
 
-    static consteval auto offset_of_reg(const uint64_t i) {
-        constexpr auto offset = offsetof(Arm64ProcessorState, gpr_list_);
-        return offset + sizeof(gpr_list_[0]) * i;
-    }
     static consteval auto offset_of(const AliasRegisters alias) {
-        if (alias==AliasRegisters::Linker)
-            return offset_of_reg(30);
-        if (alias==AliasRegisters::PC)
-            return offsetof(Arm64ProcessorState, pc);
+        constexpr auto gpr_offset = offsetof(Arm64ProcessorState, gpr_list_);
+        switch (alias) {
+            case AliasRegisters::PC:
+                return offsetof(Arm64ProcessorState, pc);
+            case AliasRegisters::Linker:
+                return gpr_offset + sizeof(gpr_list_[0]) * 30;
+            case AliasRegisters::FastTable:
+                return offsetof(Arm64ProcessorState, fastjump_table);
+        }
         return 0UL;
     }
 
-    std::array<HashableLinkAddr, 0x3FF> fastjump_table; // used when a jump with a register appears while runtime
+    std::array<HashableLinkAddr, 0x400> fastjump_table; // used when a jump with a register appears while runtime
 };
 struct Arm64CachedRegion {
     inplace_vector<uint32_t, 60> last_inst_list{}; // 0 isn't a valid arm64 instruction, so, it's our end mark
@@ -44,7 +45,7 @@ public:
 
     bool is_pc_compiled(uint64_t) override;
     void * get_thr_addr() override {
-        return &arm_v8a_state;
+        return &advanced_risc_ctx;
     }
     uint64_t compile_irs_from_pc(uint64_t) override;
     uint64_t get_reg(const AliasRegisters &reg) override;
@@ -53,6 +54,6 @@ public:
 
     std::unordered_map<uint64_t, Arm64CachedRegion> cached_pc_region;
     std::vector<InstructionMeta> arm64_inst_ordered;
-    Arm64ProcessorState arm_v8a_state={};
+    Arm64ProcessorState advanced_risc_ctx{};
 };
 }

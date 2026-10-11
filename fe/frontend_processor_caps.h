@@ -5,7 +5,7 @@
 #include <vector>
 namespace recompiler::fe {
 enum class AliasRegisters {
-    PC, Linker
+    PC, Linker, FastTable
 };
 
 class FrontendProcessorCaps {

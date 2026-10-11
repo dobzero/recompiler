@@ -5,9 +5,10 @@ namespace recompiler::ir {
 std::optional<Ir> default_arm64_to_ir(const uint32_t inst) {
     if (asm_isi::ArmV8A_Math::__NOP() == inst)
         return Ir{IrOperationType::Ir_NOP_OP};
+#if 0
     if (asm_isi::ArmV8A_Functions::__RET() == inst)
         return Ir{IrOperationType::Ir_RET_OP};
-
+#endif
     return {};
 }
 }

@@ -13,7 +13,7 @@ struct DataFlow {
             cs.write_into(static_cast<uint8_t>(0x50 + (static_cast<uint64_t>(r__))));
         }
     }
-    static void MOV_REG(CompiledStream &cs, X86RegisterType dst, X86RegisterType src) {
+    static void MOV_R64_R64(CompiledStream &cs, X86RegisterType dst, X86RegisterType src) {
         uint8_t rex = 0x48; // REX.W
         if (static_cast<uint64_t>(src) >= 8)
             rex |= 0x04;    // REX.R
@@ -24,7 +24,7 @@ struct DataFlow {
     }
 
 
-    static void MOV_R64_MEM_OR_MEM_R64(CompiledStream &cs, X86RegisterType dest, X86RegisterType base, const int32_t offset, const bool m64_to_r64) {
+    static void _mov_r64m_or_r64m(CompiledStream &cs, X86RegisterType dest, X86RegisterType base, const int32_t offset, const bool m64_to_r64) {
         uint8_t rex = 0x48;
         if (static_cast<uint32_t>(dest) >= 8) rex |= 0x04;
         if (static_cast<uint32_t>(base) >= 8) rex |= 0x01;
@@ -42,11 +42,11 @@ struct DataFlow {
     }
 
     static void MOV_R64_MEM(CompiledStream &cs, const X86RegisterType dest, const X86RegisterType base, const int32_t offset) {
-        MOV_R64_MEM_OR_MEM_R64(cs, dest, base, offset, true);
+        _mov_r64m_or_r64m(cs, dest, base, offset, true);
     }
 
     static void MOV_MEM_R64(CompiledStream &cs, const X86RegisterType dest, const X86RegisterType base, const int32_t offset) {
-        MOV_R64_MEM_OR_MEM_R64(cs, dest, base, offset, false);
+        _mov_r64m_or_r64m(cs, dest, base, offset, false);
     }
 
 
@@ -58,6 +58,52 @@ struct DataFlow {
         cs.write_into(static_cast<uint8_t>(0xB8 + (static_cast<uint8_t>(dest) & 7)));
         // imm64, little-endian
         cs.write_into<uint64_t>(value);
+    }
+
+    static void MOV_R64_MEM(CompiledStream &cs, X86RegisterType dst, X86RegisterType base, X86RegisterType index, const uint8_t scale, const int32_t displacement) {
+        uint8_t rex = 0x48;
+        const bool index_r = index != X86RegisterType::None;
+        if (static_cast<uint8_t>(dst) >= 8)
+            rex |= 0x04;
+        if (index_r && static_cast<uint8_t>(index) >= 8)
+            rex |= 0x02;
+        if (static_cast<uint8_t>(base) >= 8)
+            rex |= 0x01;
+        const auto mod=[&] {
+            if (displacement == 0 && (static_cast<uint8_t>(base) & 7) != 5)
+                return 0;
+            if (displacement >= -128 && displacement <= 127)
+                return 1;
+            return 2;
+        }();
+
+        const auto enable_sib = index_r || (static_cast<uint8_t>(base) & 7) == 4;
+        cs.write_bytes({rex, 0x8B}); // MOV r64, r/m64
+
+        const auto rm = enable_sib ? 4 : (static_cast<uint8_t>(base) & 7);
+        cs.write_into<uint8_t>((mod << 6) | ((static_cast<uint8_t>(dst) & 7) << 3) | rm);
+
+        if (enable_sib) {
+            const auto scale_bits=[&] {
+                switch (scale) {
+                    case 1:
+                    default:
+                        return 0; break;
+                    case 2: return 1; break;
+                    case 4: return 2; break;
+                    case 8: return 3; break;
+                }
+            }();
+
+            const uint8_t idx = index_r ? (static_cast<uint8_t>(index) & 7) : 4;
+            cs.write_into<uint8_t>((scale_bits << 6) | (idx << 3) | (static_cast<uint8_t>(base) & 7));
+        }
+
+        if (mod == 1) {
+            cs.write_into<uint8_t>(static_cast<uint8_t>(displacement));
+        } else if (mod == 2) {
+            cs.write_into<uint32_t>(static_cast<uint32_t>(displacement));
+        }
     }
 };
 }

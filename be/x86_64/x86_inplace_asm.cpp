@@ -16,17 +16,14 @@ public:
 namespace recompiler::be::x86_64 {
 X86InplaceAsm::X86InplaceAsm() : BackendProcessorCaps(SupportedBackends::Arch_X_86_64) {}
 
-struct CompilationContext {
-    CompiledStream x86_cs;
-    X86RegistersAllocator x86_alloc{X86RegisterType::R14};
-};
 }
 void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, const std::vector<ir::Ir> &irs_ops, BlockLinking & linker) {
 
-    CompilationContext compiler_ctx{};
-    auto &x86_result=compiler_ctx.x86_cs;
+    CompiledStream x86_cs;
+    const X86RegistersAllocator x86_alloc{X86RegisterType::R15};
 
-    x86_recipes::Functions::do_prologue(compiler_ctx.x86_cs, compiler_ctx.x86_alloc);
+    x86_recipes::Functions::do_prologue(x86_cs, x86_alloc);
+
     struct FixBranch {
         ir::Ir ir_val;
         size_t fix_index;
@@ -41,21 +38,36 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
                 throw recompiler_exception("this ir requires a specific backend");
         switch (ir_op.type) {
             case ir::IrOperationType::Ir_NOP_OP: {
-                x86_recipes::All::NOP(compiler_ctx.x86_cs);
+                x86_recipes::All::NOP(x86_cs);
                 break;
             }
             case ir::IrOperationType::Ir_BRANCH_OP: {
             }
             case ir::IrOperationType::Ir_RET_OP: {
             }
-            default: {}
+            case ir::IrOperationType::Ir_MOVE_OP: {
+                if (ir_op.ir_r_list[1].type==ir::IrOperand::Type::Immediate) {
+                    x86_recipes::DataFlow::MOV_R64_IMM64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                } else {
+                    x86_recipes::DataFlow::MOV_R64_R64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), static_cast<X86RegisterType>(ir_op.ir_r_list[1].value));
+                }
+                break;
+            }
+            case ir::IrOperationType::Ir_STORE_OP: {
+                x86_recipes::DataFlow::MOV_R64_MEM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[2].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                break;
+            }
+            default: {
+                throw std::logic_error{"Unsupported backend type"};
+            }
         }
 
-        ir_x_x86_tracing.emplace_back(std::make_pair(&ir_op, x86_result.get_stream_size()));
+        ir_x_x86_tracing.emplace_back(std::make_pair(&ir_op, x86_cs.get_stream_size()));
     }
 
-    x86_recipes::Functions::do_epilogue(x86_result);
-    compiled_pcs.emplace(pc_, std::move(x86_result));
+    x86_recipes::Functions::do_epilogue(x86_cs);
+
+    compiled_pcs.emplace(pc_, std::move(x86_cs));
 
     const auto cfg_details = enable_jit_in(compiled_pcs[pc_]);
     for (const auto &[ir_val, fix_index] : branches_fix_later) {

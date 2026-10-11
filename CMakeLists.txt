@@ -41,6 +41,8 @@ add_library(recompiler-static STATIC
         ir/types.h
         ir/default_arch_to_ir.cpp
         ir/ir_cfg.cpp
+        ir/ir_builder.cpp
+        ir/ir_builder.h
 
         types.h
         inplace_vector.h
