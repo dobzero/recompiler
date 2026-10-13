@@ -8,10 +8,6 @@
 #include "ir/types.h"
 
 namespace recompiler::fe::arm64_v8a {
-struct HashableLinkAddr {
-    uint64_t target_pc;
-    void * jump_addr;
-};
 
 struct Arm64ProcessorState {
     void * layer_addr;
@@ -27,7 +23,7 @@ struct Arm64ProcessorState {
                 return offsetof(Arm64ProcessorState, pc);
             case AliasRegisters::Linker:
                 return gpr_offset + sizeof(gpr_list_[0]) * 30;
-            case AliasRegisters::FastTable:
+            case AliasRegisters::HashableTable:
                 return offsetof(Arm64ProcessorState, fastjump_table);
         }
         return 0UL;
@@ -51,6 +47,9 @@ public:
     uint64_t compile_irs_from_pc(uint64_t) override;
     uint64_t get_reg(const AliasRegisters &reg) override;
     std::vector<ir::Ir> get_irs_from_pc(uint64_t pc) override;
+    HashableLinkAddr * get_table() override {
+        return advanced_risc_ctx.fastjump_table.data();
+    }
 
 
     std::unordered_map<uint64_t, Arm64CachedRegion> cached_pc_region;

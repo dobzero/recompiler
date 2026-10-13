@@ -42,19 +42,39 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
                 x86_recipes::All::NOP(x86_cs);
                 break;
             }
-            case ir::IrOperationType::Ir_BRANCH_OP: {
+            case ir::IrOperationType::Ir_UJUMP_OP: {
+                if (ir_op.ir_r_list[0].type==ir::IrOperand::Type::Register) {
+                    x86_recipes::All::JMP_REG(x86_cs,  static_cast<X86RegisterType>(ir_op.ir_r_list[0].value));
+                    break;
+                }
                 x86_recipes::DataFlow::MOV_R64_MEM(x86_cs, X86RegisterType::RDI, x86_alloc.get_thr_reg(), 0);
                 x86_recipes::DataFlow::MOV_R64_IMM64(x86_cs, X86RegisterType::RSI, ir_op.ir_r_list[0].value);
-                x86_recipes::All::JMP_ABS(x86_cs, reinterpret_cast<void *>(linker.c_stub_function));
+                x86_recipes::DataFlow::MOV_R64_IMM64(x86_cs, X86RegisterType::RAX, reinterpret_cast<uint64_t>(linker.c_stub_function));
+                x86_recipes::Functions::CALL(x86_cs, X86RegisterType::RAX);
                 x86_recipes::All::JMP_REG(x86_cs, X86RegisterType::RAX);
                 break;
 
             }
+            case ir::IrOperationType::Ir_SHR_OP:
+                x86_recipes::All::SHR_A64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                break;
+            case ir::IrOperationType::Ir_AND_OP:
+                x86_recipes::All::AND_R64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                break;
+            case ir::IrOperationType::Ir_ADD_OP:
+                x86_recipes::All::ADD_R64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                break;
+            case ir::IrOperationType::Ir_MUL_OP:
+                x86_recipes::All::IMUL_R64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[2].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                break;
+            case ir::IrOperationType::Ir_ADROF_OP:
+                x86_recipes::All::LEA_R64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[3].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), static_cast<X86RegisterType>(ir_op.ir_r_list[1].value), 1, ir_op.ir_r_list[2].value);
+                break;
             case ir::IrOperationType::Ir_MOVE_OP: {
                 if (ir_op.ir_r_list[1].type==ir::IrOperand::Type::Immediate) {
                     x86_recipes::DataFlow::MOV_R64_IMM64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 } else {
-                    x86_recipes::DataFlow::MOV_R64_R64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), static_cast<X86RegisterType>(ir_op.ir_r_list[1].value));
+                    x86_recipes::DataFlow::MOV_R64_R64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[1].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value));
                 }
                 break;
             }
@@ -62,6 +82,11 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
                 x86_recipes::DataFlow::MOV_MEM_R64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[2].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 break;
             }
+            case ir::IrOperationType::Ir_LOAD_OP: {
+                x86_recipes::DataFlow::MOV_R64_MEM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[2].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                break;
+            }
+
             default: {
                 //throw std::logic_error{"(recomp:) unsupported backend type"};
             }
@@ -88,6 +113,7 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
         }();
         memcpy(static_cast<uint8_t *>(cfg_details.begin) + fix_index, &value, 8);
     }
+    linker.set_first_block(cfg_details.begin, cfg_details.size);
 
     pc_x_compiled_block.emplace(pc_, cfg_details);
     linker.pc_set_block(pc_, cfg_details.begin); // set next linkable block into linker

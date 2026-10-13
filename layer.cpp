@@ -60,8 +60,8 @@ void Layer::execute_program(const std::string &pr_name) {
         if (compile_cfg_at(get_pc())==nullptr)
             break;
 
-        hostpr->execute_at_pc(get_pc(), guestpr->get_thr_addr());
-        break;
+        if (hostpr->execute_at_pc(get_pc(), guestpr->get_thr_addr()) >= end_pc_offset)
+            break;
     } while (get_pc() != end_pc_offset);
 }
 
@@ -70,6 +70,8 @@ void * Layer::compile_cfg_at(uint64_t pc) {
         pc = guestpr->compile_irs_from_pc(pc); // updates pc, pls save pc before
         const auto &irs_list=guestpr->get_irs_from_pc(pc);
         hostpr->compile_irs(pc, irs_list, block_linking);
+
+        block_linking.verify_or_populate_runtime_jmp_table(guestpr->get_table());
     }
 
     return hostpr->pc_x_compiled_block[pc].begin;

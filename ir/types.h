@@ -8,17 +8,18 @@ namespace recompiler::ir {
 enum class IrOperationType {
     Ir_NONE, // just for construction got esy
     Ir_NOP_OP,
-    Ir_BRANCH_OP,
+    Ir_UJUMP_OP,
     Ir_RET_OP,
 
     Ir_STORE_OP,
     Ir_LOAD_OP,
-    Ir_SHIFT_RIGHT_OP,
+    Ir_SHR_OP,
     Ir_AND_OP,
     Ir_ADD_OP,
     Ir_MOVE_OP,
     Ir_CMP_OP,
-    Ir_ADROF_OP
+    Ir_ADROF_OP,
+    Ir_MUL_OP
 };
 using ir_op=IrOperationType;
 

@@ -10,7 +10,7 @@ bool ir_search_for_cfg_end(const std::span<const Ir> &irs) {
 }
 
 bool ir_is_a_branch(const Ir &ir) {
-    if (ir.type==IrOperationType::Ir_BRANCH_OP)
+    if (ir.type==IrOperationType::Ir_UJUMP_OP)
         return true;
     if (ir.type==IrOperationType::Ir_RET_OP)
         return true;

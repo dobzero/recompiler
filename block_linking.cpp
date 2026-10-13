@@ -1,5 +1,8 @@
+#include "fe/frontend_processor_caps.h"
 #include "be/backend_processor_caps.h"
 #include "block_linking.h"
+
+
 namespace recompiler {
 
 BlockLinking::BlockLinking(void *l_class, const c_function_stub_t c_function_for_fallback) : layer(l_class), c_stub_function(c_function_for_fallback) {}
@@ -44,5 +47,21 @@ void BlockLinking::remove_unreachable_cfgs(const std::unique_ptr<be::BackendProc
         }
 
     }
+}
+
+bool BlockLinking::set_first_block(const void *begin, const size_t sz) {
+    constexpr uint8_t epilogue_signature[] = {0xC9, 0xC3};
+    if (!leave_addr)
+        return (leave_addr = memmem(begin, sz, epilogue_signature, sizeof(epilogue_signature)));
+    return false;
+}
+
+void BlockLinking::verify_or_populate_runtime_jmp_table(fe::HashableLinkAddr *table) {
+    if (!jump_table_ok) {
+        for (size_t i=0;i<0x400;i++)
+            if (table[i].jump_addr==nullptr)
+                table[i].jump_addr=leave_addr;
+    }
+    jump_table_ok=true;
 }
 }
