@@ -56,10 +56,12 @@ bool BlockLinking::set_first_block(const void *begin, const size_t sz) {
     return false;
 }
 
-void BlockLinking::verify_or_populate_runtime_jmp_table(fe::HashableLinkAddr *table, uint64_t final_pc) {
+void BlockLinking::verify_or_populate_runtime_jmp_table(fe::HashableLinkAddr *table, const uint64_t final_pc) {
     if (!jump_table_ok) {
-        for (size_t i=0;i<0x400;i++)
-            if (table[i].jump_addr==nullptr)
+        table[0].jump_addr = pc_x_block[0].addr;
+        table[0].target_pc = 0;
+        for (size_t i=1;i<0x400;i++)
+            if (table[i].jump_addr==nullptr||!pc_x_block.contains(table[i].target_pc))
                 if ((table[i].jump_addr=leave_addr))
                     table[i].target_pc = final_pc;
     }

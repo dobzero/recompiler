@@ -35,7 +35,7 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
     };
     std::vector<FixBranch> branches_fix_later;
     std::vector<std::pair<const ir::Ir*, size_t>> ir_x_x86_tracing;
-    const auto final_pc_of = irs_ops[irs_ops.size() - 2].pc;
+    const auto final_pc_of = irs_ops.back().pc;
 
     for (const auto &ir_op : irs_ops) {
         if (ir_op.is_exclusive_of_arch_type)
