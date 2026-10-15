@@ -26,7 +26,7 @@ public:
 
     bool set_first_block(const void * begin, size_t sz);
 
-    void verify_or_populate_runtime_jmp_table(fe::HashableLinkAddr * table);
+    void verify_or_populate_runtime_jmp_table(fe::HashableLinkAddr * table, uint64_t final_pc);
 
     void *layer;
     c_function_stub_t c_stub_function;

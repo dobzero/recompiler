@@ -33,11 +33,11 @@ void a_ret_ir(inplace_vector<ir::Ir, 15> &ir, [[maybe_unused]] const uint32_t in
         ir_mul_reg_imm(ir_v[4], 0, 16, 0);
         ir_adrof_reg_imm(ir_v[5], 15, 0, A64_S::offset_of(AliasRegisters::HashableTable), 1);
         ir_load_reg_imm_reg(ir_v[6], 1, 0, 0);
-        ir_cmp_reg_reg(ir_v[7], 0, 2); // if $0 == $2
-        ir_store_reg_imm_reg(ir_v[8], 15, A64_S::offset_of(AliasRegisters::PC), 0);
-        ir_add_reg_imm(ir_v[9], 1, 8);
-        ir_load_reg_imm_reg(ir_v[10], 1, 0, 0);
-        ir_ujump_reg(ir_v[11], 0);
-    }, 12);
+        //ir_cmp_reg_reg(ir_v[7], 0, 2); // if $0 == $2
+        ir_store_reg_imm_reg(ir_v[7], 15, A64_S::offset_of(AliasRegisters::PC), 0);
+        ir_add_reg_imm(ir_v[8], 1, 8);
+        ir_load_reg_imm_reg(ir_v[9], 1, 0, 0);
+        ir_ujump_reg(ir_v[10], 0);
+    }, 11);
 }
 }

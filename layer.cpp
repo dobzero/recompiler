@@ -1,5 +1,8 @@
 #include "layer.h"
 
+#include <format>
+#include <iostream>
+
 #include "fe/arm64_v8a/processor_arm64_v8a.h"
 #include "be/x86_64/x86_inplace_asm.h"
 
@@ -7,9 +10,9 @@ extern "C" void * layer_stub_function(void * layer_ptr, const uint64_t pc) {
     auto * layer = static_cast<recompiler::Layer *>(layer_ptr);
     void * block_result = layer->compile_cfg_at(pc);
     if (const auto arm64_guest = std::dynamic_pointer_cast<recompiler::fe::arm64_v8a::ProcessorArm64v8a>(layer->guestpr)) {
-        auto & pc_cache = arm64_guest->advanced_risc_ctx.fastjump_table[pc >> 2];
-        pc_cache.target_pc = pc;
-        pc_cache.jump_addr = block_result;
+        auto &[target_pc, jump_addr] = arm64_guest->a_r_m_ctx.fastjump_table[pc >> 2];
+        target_pc = pc;
+        jump_addr = block_result;
     }
     return block_result;
 }
@@ -60,9 +63,14 @@ void Layer::execute_program(const std::string &pr_name) {
         if (compile_cfg_at(get_pc())==nullptr)
             break;
 
-        if (hostpr->execute_at_pc(get_pc(), guestpr->get_thr_addr()) >= end_pc_offset)
-            break;
+        hostpr->execute_at_pc(get_pc(), guestpr->get_thr_addr());
     } while (get_pc() != end_pc_offset);
+
+    std::cout << std::format("final pc addr: {:X}\n", get_pc());
+    std::cout << std::format("unique ir generated: {}\nir statistics:\n", guestpr->ir_statistics.size());
+    for (const auto & [inst, count] : guestpr->ir_statistics) {
+        std::cout << std::format("ir {}, count {}\n", to_string(inst), count);
+    }
 }
 
 void * Layer::compile_cfg_at(uint64_t pc) {
@@ -71,7 +79,7 @@ void * Layer::compile_cfg_at(uint64_t pc) {
         const auto &irs_list=guestpr->get_irs_from_pc(pc);
         hostpr->compile_irs(pc, irs_list, block_linking);
 
-        block_linking.verify_or_populate_runtime_jmp_table(guestpr->get_table());
+        block_linking.verify_or_populate_runtime_jmp_table(guestpr->get_table(), read_only->size());
     }
 
     return hostpr->pc_x_compiled_block[pc].begin;

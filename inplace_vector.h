@@ -37,6 +37,13 @@ public:
     operator std::span<const T>() const {
         return std::span(data(), size());
     }
+    auto & front() const {
+        return data()[0];
+    }
+    auto & back() const {
+        return data()[size()-1];
+    }
+
     auto empty() const {
         return size()==0;
     }
@@ -54,6 +61,12 @@ public:
         return reinterpret_cast<const T*>(data_bytes.data());
     }
     auto end() const {
+        return begin()+i_size;
+    }
+    auto begin() {
+        return reinterpret_cast<T*>(data_bytes.data());
+    }
+    auto end() {
         return begin()+i_size;
     }
 

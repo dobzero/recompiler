@@ -6,7 +6,7 @@ recompiler::fe::arm64_v8a::ProcessorArm64v8a::ProcessorArm64v8a(LayerState * lay
     add_supported_backend_targets({
         SupportedBackends::Arch_X_86_64}
         );
-    advanced_risc_ctx.layer_addr = layer_state;
+    a_r_m_ctx.layer_addr = layer_state;
 }
 
 bool recompiler::fe::arm64_v8a::ProcessorArm64v8a::is_pc_compiled(const uint64_t pc) {
@@ -25,21 +25,24 @@ const std::vector arm64_list_default_table={
 };
 
 
-inplace_vector<ir::Ir, 15> arm64_to_ir(std::vector<InstructionMeta> &arm64_list_ord, const uint32_t inst, uint64_t pc) {
+inplace_vector<ir::Ir, 15> arm64_to_ir(std::vector<InstructionMeta> &arm64_list_ord, const uint32_t inst, const uint64_t pc) {
     inplace_vector<ir::Ir, 15> ir_r;
     if (const auto default_ir = ir::default_arm64_to_ir(inst)) {
         ir_r.emplace_back(*default_ir);
-        return ir_r;
-    }
-    for (auto arm64_list_it = arm64_list_ord.begin(); arm64_list_it!=arm64_list_ord.end(); ) {
-        if ((inst & arm64_list_it->mask) != arm64_list_it->value) {
-            ++arm64_list_it;
-            continue;
-        }
-        arm64_list_it->hits++;
-        arm64_list_it->conv_func_ir_callback(ir_r, inst, pc);
+    } else {
+        for (auto arm64_list_it = arm64_list_ord.begin(); arm64_list_it!=arm64_list_ord.end(); ) {
+            if ((inst & arm64_list_it->mask) != arm64_list_it->value) {
+                ++arm64_list_it;
+                continue;
+            }
+            arm64_list_it->hits++;
+            arm64_list_it->conv_func_ir_callback(ir_r, inst, pc);
 
-        break;
+            break;
+        }
+    }
+    for (auto &ir_op_type : ir_r) {
+        ir_op_type.pc = pc;
     }
 
     return ir_r;
@@ -51,24 +54,25 @@ uint64_t recompiler::fe::arm64_v8a::ProcessorArm64v8a::compile_irs_from_pc(const
         arm64_inst_ordered=arm64_list_default_table;
 
     bool cfg_block_finished=false;
+    std::array pc_ir_x_pc{pc_target, pc_target};
     do {
         Arm64CachedRegion cached_list = {};
-        uint64_t first_pc = pc_target;
-        uint64_t ir_x_pc = first_pc;
         while (cached_list.last_inst_list.size() != cached_list.last_inst_list.capacity()) {
-            if (!layer_state->is_reachable(first_pc)) {
+            if (!layer_state->is_reachable(pc_ir_x_pc[0])) {
                 break;
             }
-            cached_list.last_inst_list.emplace_back(layer_state->read_u32(first_pc));
-            first_pc+=4;
+            cached_list.last_inst_list.emplace_back(layer_state->read_u32(pc_ir_x_pc[0]));
+            pc_ir_x_pc[0]+=4;
         }
 
         for (const auto &inst_arm64 : cached_list.last_inst_list) {
             if (inst_arm64) {
-                auto ir_value = arm64_to_ir(arm64_inst_ordered, inst_arm64, ir_x_pc);
-                ir_x_pc += 4;
-                for (const auto &ir_valid : ir_value)
+                auto ir_value = arm64_to_ir(arm64_inst_ordered, inst_arm64, pc_ir_x_pc[1]);
+                pc_ir_x_pc[1]+=4;
+                for (const auto &ir_valid : ir_value) {
+                    this->ir_statistics[ir_valid.type]++;
                     cached_list.irs_list.emplace_back(ir_valid);
+                }
 
                 if (ir_search_for_cfg_end(cached_list.irs_list))
                     if ((cfg_block_finished=true))
@@ -89,7 +93,7 @@ uint64_t recompiler::fe::arm64_v8a::ProcessorArm64v8a::compile_irs_from_pc(const
 
 uint64_t recompiler::fe::arm64_v8a::ProcessorArm64v8a::get_reg(const AliasRegisters &reg) {
     if (reg==AliasRegisters::PC)
-        return advanced_risc_ctx.pc;
+        return a_r_m_ctx.pc;
     return -1;
 }
 

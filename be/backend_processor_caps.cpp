@@ -4,7 +4,7 @@
 
 #include "compiled_stream.h"
 
-recompiler::be::CompiledBlockDetails recompiler::be::enable_jit_in(const CompiledStream &compiled) {
+recompiler::be::CompiledBlockDetails recompiler::be::enable_jit_in(const CompiledStream &compiled, const uint64_t final_g_pc) {
     const auto code_size = [&compiled] {
         const auto size = compiled.get_stream_size();
         return (size + 4095) & ~4095;
@@ -19,6 +19,7 @@ recompiler::be::CompiledBlockDetails recompiler::be::enable_jit_in(const Compile
         .begin = code,
         .size = code_size,
         .pc_after = pc_offset_size,
+        .g_pc_after = final_g_pc
     };
 }
 

@@ -2,6 +2,7 @@
 
 #include "inplace_vector.h"
 #include "ir/types.h"
+#include <unordered_map>
 #include <vector>
 namespace recompiler::fe {
 enum class AliasRegisters {
@@ -11,6 +12,9 @@ struct HashableLinkAddr {
     uint64_t target_pc;
     void * jump_addr;
 };
+
+// ARM32, ARM64, MIPS I, MIPS IV uses 4 bytes instruction encode, so this will be useful for all
+using InstructionStatistics = std::unordered_map<ir::IrOperationType, size_t>;
 
 class FrontendProcessorCaps {
 public:
@@ -35,5 +39,8 @@ public:
     LayerState *layer_state;
     SupportedFrontends type;
     inplace_vector<SupportedBackends, 2> supported_target_cpu_type;
+
+
+    InstructionStatistics ir_statistics;
 };
 }

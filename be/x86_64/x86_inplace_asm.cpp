@@ -17,10 +17,14 @@ namespace recompiler::be::x86_64 {
 X86InplaceAsm::X86InplaceAsm() : BackendProcessorCaps(SupportedBackends::Arch_X_86_64) {}
 
 }
+
 void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, const std::vector<ir::Ir> &irs_ops, BlockLinking & linker) {
+    constexpr auto to_reg = [](uint64_t val) {
+        return static_cast<X86RegisterType>(val);
+    };
 
     CompiledStream x86_cs;
-    const X86RegistersAllocator x86_alloc{X86RegisterType::R15};
+    const X86RegistersAllocator x86_alloc(X86RegisterType::R15);
 
     if (linker.is_entry_point(pc_))
         x86_recipes::Functions::do_prologue(x86_cs, x86_alloc);
@@ -44,7 +48,7 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
             }
             case ir::IrOperationType::Ir_UJUMP_OP: {
                 if (ir_op.ir_r_list[0].type==ir::IrOperand::Type::Register) {
-                    x86_recipes::All::JMP_REG(x86_cs,  static_cast<X86RegisterType>(ir_op.ir_r_list[0].value));
+                    x86_recipes::All::JMP_REG(x86_cs, to_reg(ir_op.ir_r_list[0].value));
                     break;
                 }
                 x86_recipes::DataFlow::MOV_R64_MEM(x86_cs, X86RegisterType::RDI, x86_alloc.get_thr_reg(), 0);
@@ -56,39 +60,39 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
 
             }
             case ir::IrOperationType::Ir_SHR_OP:
-                x86_recipes::All::SHR_A64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                x86_recipes::All::SHR_A64_IMM(x86_cs, to_reg(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 break;
             case ir::IrOperationType::Ir_AND_OP:
-                x86_recipes::All::AND_R64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                x86_recipes::All::AND_R64_IMM(x86_cs, to_reg(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 break;
             case ir::IrOperationType::Ir_ADD_OP:
-                x86_recipes::All::ADD_R64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                x86_recipes::All::ADD_R64_IMM(x86_cs, to_reg(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 break;
             case ir::IrOperationType::Ir_MUL_OP:
-                x86_recipes::All::IMUL_R64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[2].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                x86_recipes::All::IMUL_R64_IMM(x86_cs, to_reg(ir_op.ir_r_list[2].value), to_reg(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 break;
             case ir::IrOperationType::Ir_ADROF_OP:
-                x86_recipes::All::LEA_R64_IMM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[3].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), static_cast<X86RegisterType>(ir_op.ir_r_list[1].value), 1, ir_op.ir_r_list[2].value);
+                x86_recipes::All::LEA_R64_IMM(x86_cs, to_reg(ir_op.ir_r_list[3].value), to_reg(ir_op.ir_r_list[0].value), to_reg(ir_op.ir_r_list[1].value), 1, ir_op.ir_r_list[2].value);
                 break;
             case ir::IrOperationType::Ir_MOVE_OP: {
                 if (ir_op.ir_r_list[1].type==ir::IrOperand::Type::Immediate) {
-                    x86_recipes::DataFlow::MOV_R64_IMM64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                    x86_recipes::DataFlow::MOV_R64_IMM64(x86_cs, to_reg(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 } else {
-                    x86_recipes::DataFlow::MOV_R64_R64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[1].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value));
+                    x86_recipes::DataFlow::MOV_R64_R64(x86_cs, to_reg(ir_op.ir_r_list[1].value), to_reg(ir_op.ir_r_list[0].value));
                 }
                 break;
             }
             case ir::IrOperationType::Ir_STORE_OP: {
-                x86_recipes::DataFlow::MOV_MEM_R64(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[2].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                x86_recipes::DataFlow::MOV_MEM_R64(x86_cs, to_reg(ir_op.ir_r_list[2].value), to_reg(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 break;
             }
             case ir::IrOperationType::Ir_LOAD_OP: {
-                x86_recipes::DataFlow::MOV_R64_MEM(x86_cs, static_cast<X86RegisterType>(ir_op.ir_r_list[2].value), static_cast<X86RegisterType>(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
+                x86_recipes::DataFlow::MOV_R64_MEM(x86_cs, to_reg(ir_op.ir_r_list[2].value), to_reg(ir_op.ir_r_list[0].value), ir_op.ir_r_list[1].value);
                 break;
             }
 
             default: {
-                //throw std::logic_error{"(recomp:) unsupported backend type"};
+                throw recompiler_exception("ir {} not impl. in this backend", to_string(ir_op.type));
             }
         }
 
@@ -100,7 +104,7 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
 
     compiled_pcs.emplace(pc_, std::move(x86_cs));
 
-    const auto cfg_details = enable_jit_in(compiled_pcs[pc_]);
+    const auto cfg_details = enable_jit_in(compiled_pcs[pc_], irs_ops.back().pc);
     for (const auto &[ir_val, fix_index] : branches_fix_later) {
         const int64_t offset = static_cast<int64_t>(ir_val.ir_r_list.begin()->value);
         const auto target_pc = ir_val.pc+offset;
@@ -108,8 +112,8 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
             if (target_pc>=final_pc_of) { // outside this cfg
                 return static_cast<uint8_t*>(linker.get_cfg_jump_addr(ir_val).first);
             }
-            const auto &[_, offset_pc_ir] = ir_x_x86_tracing[offset/4];
-            return static_cast<uint8_t*>(cfg_details.begin) + offset_pc_ir;
+            const auto &[_, pc_ir] = ir_x_x86_tracing[offset/4];
+            return static_cast<uint8_t*>(cfg_details.begin) + pc_ir;
         }();
         memcpy(static_cast<uint8_t *>(cfg_details.begin) + fix_index, &value, 8);
     }
@@ -120,13 +124,17 @@ void recompiler::be::x86_64::X86InplaceAsm::compile_irs(const uint64_t pc_, cons
 }
 
 typedef void (*c_entry_jit_func)(void *state);
-size_t recompiler::be::x86_64::X86InplaceAsm::execute_at_pc(const uint64_t pc_, void * thr_addr) {
+
+namespace recompiler::be {
+ExecutionResult x86_64::X86InplaceAsm::execute_at_pc(const uint64_t pc_, void * thr_addr) {
     if (const auto &pc_x_code_it = pc_x_compiled_block.find(pc_);
         pc_x_code_it!=pc_x_compiled_block.end()) {
-
         reinterpret_cast<c_entry_jit_func>(pc_x_code_it->second.begin)(thr_addr);
-        return pc_x_code_it->second.pc_after;
+        return {
+            .g_pc_begin = pc_,
+            .g_pc_end = pc_x_code_it->second.g_pc_after,
+        };
     }
-
-    return 0;
+    return {};
+}
 }

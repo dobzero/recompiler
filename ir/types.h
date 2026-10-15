@@ -21,6 +21,8 @@ enum class IrOperationType {
     Ir_ADROF_OP,
     Ir_MUL_OP
 };
+
+std::string to_string(IrOperationType type);
 using ir_op=IrOperationType;
 
 class IrOperand {

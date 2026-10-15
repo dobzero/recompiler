@@ -2,6 +2,7 @@
   <dictionary name="project">
     <words>
       <w>TDMI</w>
+      <w>UJUMP</w>
       <w>addrblk</w>
       <w>adrof</w>
       <w>fastjump</w>
@@ -11,6 +12,7 @@
       <w>movecs</w>
       <w>sizeblk</w>
       <w>socdesc</w>
+      <w>ujump</w>
       <w>uthr</w>
     </words>
   </dictionary>

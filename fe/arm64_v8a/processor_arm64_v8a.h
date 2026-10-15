@@ -42,18 +42,18 @@ public:
 
     bool is_pc_compiled(uint64_t) override;
     void * get_thr_addr() override {
-        return &advanced_risc_ctx;
+        return &a_r_m_ctx;
     }
     uint64_t compile_irs_from_pc(uint64_t) override;
     uint64_t get_reg(const AliasRegisters &reg) override;
     std::vector<ir::Ir> get_irs_from_pc(uint64_t pc) override;
     HashableLinkAddr * get_table() override {
-        return advanced_risc_ctx.fastjump_table.data();
+        return a_r_m_ctx.fastjump_table.data();
     }
 
 
     std::unordered_map<uint64_t, Arm64CachedRegion> cached_pc_region;
     std::vector<InstructionMeta> arm64_inst_ordered;
-    Arm64ProcessorState advanced_risc_ctx{};
+    Arm64ProcessorState a_r_m_ctx{};
 };
 }
