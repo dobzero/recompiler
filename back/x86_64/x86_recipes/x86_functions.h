@@ -1,7 +1,7 @@
 #pragma once
 #include "x86_data_flow.h"
 
-namespace recompiler::be::x86_64::x86_recipes {
+namespace recompiler::back::x86_64::x86_recipes {
 struct Functions {
 
     static void RET(CompiledStream & cs) {

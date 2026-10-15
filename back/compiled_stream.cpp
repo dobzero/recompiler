@@ -1,6 +1,6 @@
 #include "compiled_stream.h"
 
-namespace recompiler::be {
+namespace recompiler::back {
 CodeBuffer && CompiledStream::reuse_buffer() {
     for (auto & vector : stream_list) {
         vector.clear();

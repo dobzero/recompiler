@@ -4,7 +4,7 @@
 
 #include "compiled_stream.h"
 
-recompiler::be::CompiledBlockDetails recompiler::be::enable_jit_in(const CompiledStream &compiled, const uint64_t final_g_pc) {
+recompiler::back::CompiledBlockDetails recompiler::back::enable_jit_in(const CompiledStream &compiled, const uint64_t final_g_pc) {
     const auto code_size = [&compiled] {
         const auto size = compiled.get_stream_size();
         return (size + 4095) & ~4095;
@@ -23,7 +23,7 @@ recompiler::be::CompiledBlockDetails recompiler::be::enable_jit_in(const Compile
     };
 }
 
-void recompiler::be::disable_jit_in(CompiledBlockDetails &block) {
+void recompiler::back::disable_jit_in(CompiledBlockDetails &block) {
     munmap(block.begin, block.size);
     block = {};
 }

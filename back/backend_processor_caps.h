@@ -7,7 +7,7 @@
 #include <vector>
 
 
-namespace recompiler::be {
+namespace recompiler::back {
 struct CompiledBlockDetails {
     // block location and size
     void *begin;

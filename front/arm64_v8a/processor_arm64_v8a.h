@@ -3,11 +3,11 @@
 #include <cstdint>
 #include <vector>
 
-#include "fe/frontend_processor_caps.h"
+#include "front/frontend_processor_caps.h"
 #include "arm64_b_list.h"
 #include "ir/types.h"
 
-namespace recompiler::fe::arm64_v8a {
+namespace recompiler::front::arm64_v8a {
 
 struct Arm64ProcessorState {
     void * layer_addr;

@@ -3,7 +3,7 @@
 #include "processor_arm64_v8a.h"
 #include "ir/ir_builder.h"
 
-namespace recompiler::fe::arm64_v8a {
+namespace recompiler::front::arm64_v8a {
 using A64_S = Arm64ProcessorState;
 void a_b_ir(inplace_vector<ir::Ir, 15> &ir, const uint32_t inst, const uint64_t pc) {
     uint64_t offset = 0;

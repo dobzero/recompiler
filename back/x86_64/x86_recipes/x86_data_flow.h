@@ -1,10 +1,10 @@
 #pragma once
 
-#include "be/x86_64/x86_registers_allocator.h"
-#include "../../compiled_stream.h"
+#include "../x86_registers_allocator.h"
+#include "back/compiled_stream.h"
 #include <cstdint>
 
-namespace recompiler::be::x86_64::x86_recipes {
+namespace recompiler::back::x86_64::x86_recipes {
 struct DataFlow {
     static void PUSH(CompiledStream &cs, const X86RegisterType r__) {
         if (r__ >= X86RegisterType::R8) {
@@ -24,7 +24,7 @@ struct DataFlow {
     }
 
 
-    static void mov_r64m_or_r64m(CompiledStream& cs, X86RegisterType reg, X86RegisterType base, const int32_t offset, const bool m64_to_r64) {
+    static void mov_r64m_or_r64m(CompiledStream& cs, X86RegisterType reg, X86RegisterType base, const int32_t offset, const bool to_register) {
         const auto r = static_cast<uint8_t>(reg);
         const auto b = static_cast<uint8_t>(base);
 
@@ -33,7 +33,7 @@ struct DataFlow {
             rex |= 0x04; // REX.R
         if (b >= 8)
             rex |= 0x01; // REX.B
-        cs.write_bytes({rex, static_cast<uint8_t>(m64_to_r64 ? 0x8B : 0x89)});
+        cs.write_bytes({rex, static_cast<uint8_t>(to_register ? 0x8B : 0x89)});
         // Use disp8 whenever possible.
         const uint8_t mod = (offset >= -128 && offset <= 127) ? 0x40 : 0x80;
         const bool needs_sib = (b & 7) == 4;
@@ -56,8 +56,8 @@ struct DataFlow {
         mov_r64m_or_r64m(cs, dest, base, offset, true);
     }
 
-    static void MOV_MEM_R64(CompiledStream &cs, const X86RegisterType dest, const X86RegisterType base, const int32_t offset) {
-        mov_r64m_or_r64m(cs, dest, base, offset, false);
+    static void MOV_MEM_R64(CompiledStream &cs, const X86RegisterType src, const X86RegisterType base, const int32_t offset) {
+        mov_r64m_or_r64m(cs, src, base, offset, false);
     }
 
 

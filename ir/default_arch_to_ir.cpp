@@ -19,7 +19,7 @@ std::string to_string(const IrOperationType type) {
         case IrOperationType::Ir_AND_OP:
             return "AND (bitwise and)";
         case IrOperationType::Ir_ADD_OP:
-            return "ADD (adds)";
+            return "ADD (adds r+r)";
         case IrOperationType::Ir_MOVE_OP:
             return "MOVE (moves from r/m)";
         case IrOperationType::Ir_CMP_OP:
@@ -27,10 +27,10 @@ std::string to_string(const IrOperationType type) {
         case IrOperationType::Ir_ADROF_OP:
             return "ADROF (get addr of r+imm)";
         case IrOperationType::Ir_MUL_OP:
-            return "MUL (multiplies)";
+            return "MUL (multiplies r*r)";
 
             default:
-            return "NONE (?, inv ir type)";
+            return "NONE (inv. ir type)";
     }
 }
 

@@ -1,6 +1,6 @@
 #pragma once
-#include "fe/frontend_processor_caps.h"
-#include "be/backend_processor_caps.h"
+#include "front/frontend_processor_caps.h"
+#include "back/backend_processor_caps.h"
 #include "platform_features.h"
 #include "block_linking.h"
 
@@ -21,8 +21,8 @@ public:
     void * compile_cfg_at(uint64_t pc);
 
     PlatformFeatures usable_features_;
-    std::shared_ptr<fe::FrontendProcessorCaps> guestpr;
-    std::shared_ptr<be::BackendProcessorCaps> hostpr;
+    std::shared_ptr<front::FrontendProcessorCaps> s_guest_f;
+    std::shared_ptr<back::BackendProcessorCaps> s_host_b;
 private:
     std::unordered_map<std::string, std::vector< uint8_t>> programs_list;
 

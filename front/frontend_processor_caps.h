@@ -4,7 +4,7 @@
 #include "ir/types.h"
 #include <unordered_map>
 #include <vector>
-namespace recompiler::fe {
+namespace recompiler::front {
 enum class AliasRegisters {
     PC, Linker, HashableTable
 };

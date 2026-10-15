@@ -1,8 +1,8 @@
 #pragma once
 #include "../backend_processor_caps.h"
-#include "be/compiled_stream.h"
+#include "back/compiled_stream.h"
 
-namespace recompiler::be::x86_64 {
+namespace recompiler::back::x86_64 {
 class X86InplaceAsm final : public BackendProcessorCaps {
 public:
     X86InplaceAsm();

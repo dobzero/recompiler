@@ -1,7 +1,7 @@
 #pragma once
 #include "ir/types.h"
 
-namespace recompiler::fe::arm64_v8a {
+namespace recompiler::front::arm64_v8a {
     void a_b_ir(inplace_vector<ir::Ir, 15> &ir, uint32_t inst, uint64_t);
     void a_ret_ir(inplace_vector<ir::Ir, 15> &ir, uint32_t inst, uint64_t);
     using OP_IR = decltype(a_b_ir);

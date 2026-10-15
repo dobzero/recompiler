@@ -4,7 +4,7 @@
 #include <list>
 #include <span>
 
-namespace recompiler::be {
+namespace recompiler::back {
 using CodeBuffer = std::list<inplace_vector<uint8_t, 0x4000>>;
 class CompiledStream {
 public:

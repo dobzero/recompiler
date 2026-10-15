@@ -2,14 +2,14 @@
 
 #include <algorithm>
 
-recompiler::fe::arm64_v8a::ProcessorArm64v8a::ProcessorArm64v8a(LayerState * layer_state) : FrontendProcessorCaps(layer_state, sf_::Frontend_ARM_V8_A) {
+recompiler::front::arm64_v8a::ProcessorArm64v8a::ProcessorArm64v8a(LayerState * layer_state) : FrontendProcessorCaps(layer_state, sf_::Frontend_ARM_V8_A) {
     add_supported_backend_targets({
         SupportedBackends::Arch_X_86_64}
         );
     a_r_m_ctx.layer_addr = layer_state;
 }
 
-bool recompiler::fe::arm64_v8a::ProcessorArm64v8a::is_pc_compiled(const uint64_t pc) {
+bool recompiler::front::arm64_v8a::ProcessorArm64v8a::is_pc_compiled(const uint64_t pc) {
     if (cached_pc_region.contains(pc))
         return true;
 
@@ -17,7 +17,7 @@ bool recompiler::fe::arm64_v8a::ProcessorArm64v8a::is_pc_compiled(const uint64_t
 }
 
 namespace recompiler {
-using namespace fe::arm64_v8a;
+using namespace front::arm64_v8a;
 using I_M = InstructionMeta;
 const std::vector arm64_list_default_table={
     I_M{.mask = 0xFC000000, .value = 0x14000000, .conv_func_ir_callback = a_b_ir, .hits = 0},
@@ -49,7 +49,7 @@ inplace_vector<ir::Ir, 15> arm64_to_ir(std::vector<InstructionMeta> &arm64_list_
 }
 }
 
-uint64_t recompiler::fe::arm64_v8a::ProcessorArm64v8a::compile_irs_from_pc(const uint64_t pc_target) {
+uint64_t recompiler::front::arm64_v8a::ProcessorArm64v8a::compile_irs_from_pc(const uint64_t pc_target) {
     if (arm64_inst_ordered.empty())
         arm64_inst_ordered=arm64_list_default_table;
 
@@ -91,13 +91,13 @@ uint64_t recompiler::fe::arm64_v8a::ProcessorArm64v8a::compile_irs_from_pc(const
     return pc_target;
 }
 
-uint64_t recompiler::fe::arm64_v8a::ProcessorArm64v8a::get_reg(const AliasRegisters &reg) {
+uint64_t recompiler::front::arm64_v8a::ProcessorArm64v8a::get_reg(const AliasRegisters &reg) {
     if (reg==AliasRegisters::PC)
         return a_r_m_ctx.pc;
     return -1;
 }
 
-std::vector<recompiler::ir::Ir> recompiler::fe::arm64_v8a::ProcessorArm64v8a::get_irs_from_pc(const uint64_t pc) {
+std::vector<recompiler::ir::Ir> recompiler::front::arm64_v8a::ProcessorArm64v8a::get_irs_from_pc(const uint64_t pc) {
     const auto &[last_inst_list, irs_list] = cached_pc_region.at(pc);
     if (irs_list.empty()) {
         return {};

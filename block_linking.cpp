@@ -1,5 +1,5 @@
-#include "fe/frontend_processor_caps.h"
-#include "be/backend_processor_caps.h"
+#include "front/frontend_processor_caps.h"
+#include "back/backend_processor_caps.h"
 #include "block_linking.h"
 
 
@@ -29,11 +29,11 @@ std::pair<void *,uint64_t> BlockLinking::get_cfg_jump_addr(const ir::Ir &ir) {
     }();
 }
 
-bool BlockLinking::is_entry_point(const uint64_t pc) {
-    return std::ranges::find(pc_entries, pc) != pc_entries.end();
+bool BlockLinking::is_entry_point(const uint64_t pc) const {
+    return pc_x_block.contains(pc);
 }
 
-void BlockLinking::remove_unreachable_cfgs(const std::unique_ptr<be::BackendProcessorCaps> &hostpr) {
+void BlockLinking::remove_unreachable_cfgs(const std::unique_ptr<back::BackendProcessorCaps> &hostpr) {
     for (auto pc_x_blk_it = hostpr->pc_x_compiled_block.begin();
             pc_x_blk_it != hostpr->pc_x_compiled_block.end(); ) {
 
@@ -51,12 +51,12 @@ void BlockLinking::remove_unreachable_cfgs(const std::unique_ptr<be::BackendProc
 
 bool BlockLinking::set_first_block(const void *begin, const size_t sz) {
     constexpr uint8_t epilogue_signature[] = {0xC9, 0xC3};
-    if (!leave_addr)
+    if (leave_addr==nullptr)
         return (leave_addr = memmem(begin, sz, epilogue_signature, sizeof(epilogue_signature)));
     return false;
 }
 
-void BlockLinking::verify_or_populate_runtime_jmp_table(fe::HashableLinkAddr *table, const uint64_t final_pc) {
+void BlockLinking::verify_or_populate_runtime_jmp_table(front::HashableLinkAddr *table, const uint64_t final_pc) {
     if (!jump_table_ok) {
         table[0].jump_addr = pc_x_block[0].addr;
         table[0].target_pc = 0;
